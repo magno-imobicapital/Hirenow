@@ -1,10 +1,12 @@
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      UserRole @default(CANDIDATE)
-  active    Boolean  @default(true)
+  id String @id @default(uuid())
+
+  isActive Boolean @default(true) @map("is_active")
+  email    String  @unique
+  password String
+
+  role UserRole @default(CANDIDATE)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -15,7 +15,7 @@ model Position {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   createdById  String        @map("created_by_id")
-  createdBy    User          @relation(fields: [createdById], references: [id])
+  createdBy    User          @relation(fields: [createdById], references: [id], onDelete: Restrict)
   applications Application[]
 
   // TODO: Adicionar status em POSITION: OPEN, CLOSED, DRAFT
@@ -50,11 +50,12 @@ model Application {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user       User        @relation(fields: [userId], references: [id])
-  position   Position    @relation(fields: [positionId], references: [id])
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position   Position    @relation(fields: [positionId], references: [id], onDelete: Restrict)
   interviews Interview[]
 
   @@unique([userId, positionId])
+  @@index([positionId])
   @@map("applications")
   @@schema("recruitment")
 }
@@ -64,13 +65,13 @@ model Interview {
   applicationId String @map("application_id")
 
   title       String
-  meetingUrl  String   @map("meeting_url")
+  meetingUrl  String?   @map("meeting_url")
   scheduledAt DateTime @map("scheduled_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  application Application @relation(fields: [applicationId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@map("interviews")
   @@schema("recruitment")
@@ -106,7 +107,7 @@ model CandidateProfile {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   userId String @unique @map("user_id")
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("candidate_profiles")
   @@schema("recruitment")
