@@ -1,1 +1,1 @@
-// TODO: Adicionar nome das filas aqui.
+export const MAIL_QUEUE = 'mail_queue';
