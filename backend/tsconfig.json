@@ -27,6 +27,9 @@
       ],
       "@app/shared/*": [
         "libs/shared/src/*"
+      ],
+      "@prisma/generated": [
+        "prisma/generated/prisma/client.ts"
       ]
     }
   }
