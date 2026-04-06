@@ -1,0 +1,25 @@
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(CANDIDATE)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile      CandidateProfile?
+  positions    Position[]
+  applications Application[]
+
+  @@map("users")
+  @@schema("public")
+}
+
+enum UserRole {
+  ADMIN
+  RECRUITER
+  CANDIDATE
+
+  @@schema("public")
+}

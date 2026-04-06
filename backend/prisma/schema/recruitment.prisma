@@ -1,0 +1,113 @@
+model Position {
+  id       String  @id @default(uuid())
+  isActive Boolean @map("is_active")
+
+  title          String
+  description    String
+  employmentType EmploymentType @map("employment_type")
+  location       String
+
+  salaryMin Decimal  @map("salary_min") @db.Decimal(10, 2)
+  salaryMax Decimal  @map("salary_max") @db.Decimal(10, 2)
+  currency  Currency
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdById  String        @map("created_by_id")
+  createdBy    User          @relation(fields: [createdById], references: [id])
+  applications Application[]
+
+  // TODO: Adicionar status em POSITION: OPEN, CLOSED, DRAFT
+  @@map("positions")
+  @@schema("recruitment")
+}
+
+enum EmploymentType {
+  CLT
+  PJ
+  FREELANCE
+  INTERNSHIP
+  TEMPORARY
+
+  @@schema("recruitment")
+}
+
+enum Currency {
+  BRL
+  USD
+  EUR
+
+  @@schema("recruitment")
+}
+
+model Application {
+  id         String            @id @default(uuid())
+  userId     String            @map("user_id")
+  positionId String            @map("position_id")
+  status     ApplicationStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user       User        @relation(fields: [userId], references: [id])
+  position   Position    @relation(fields: [positionId], references: [id])
+  interviews Interview[]
+
+  @@unique([userId, positionId])
+  @@map("applications")
+  @@schema("recruitment")
+}
+
+model Interview {
+  id            String @id @default(uuid())
+  applicationId String @map("application_id")
+
+  title       String
+  meetingUrl  String   @map("meeting_url")
+  scheduledAt DateTime @map("scheduled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  application Application @relation(fields: [applicationId], references: [id])
+
+  @@map("interviews")
+  @@schema("recruitment")
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  INTERVIEW
+  TECHNICAL_INTERVIEW
+  WITHDRAWN
+  HIRED
+  // TODO: Adicionar futuramente
+  // OFFERED
+  // REJECTED
+
+  @@schema("recruitment")
+}
+
+model CandidateProfile {
+  id String @id @default(uuid())
+
+  fullName          String    @map("full_name")
+  birthDate         DateTime? @map("birth_date") @db.Date
+  about             String?
+  mobilePhone       String?   @map("mobile_phone")
+  landlinePhone     String?   @map("landline_phone")
+  salaryExpectation Decimal?  @map("salary_expectation") @db.Decimal(10, 2)
+  resumeUrl         String?   @map("resume_url")
+  // TODO: SE VIÁVEL, COLOCAR EXPERIÊNCIA PROFISSIONAL
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("candidate_profiles")
+  @@schema("recruitment")
+}
