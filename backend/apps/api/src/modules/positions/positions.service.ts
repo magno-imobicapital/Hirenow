@@ -1,5 +1,6 @@
 import { PrismaService } from '@app/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { EmploymentType, Prisma } from '@prisma/generated';
 import { CreatePositionDto } from './dto/create-position.dto';
 
 @Injectable()
@@ -48,8 +49,24 @@ export class PositionsService {
     return position;
   }
 
-  async findAll(page: number, limit: number) {
-    const where = { isActive: true };
+  async findAll(
+    page: number,
+    limit: number,
+    search?: string,
+    employmentType?: EmploymentType,
+  ) {
+    const where: Prisma.PositionWhereInput = {
+      isActive: true,
+      ...(employmentType ? { employmentType } : {}),
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
     const [items, total] = await this.prisma.$transaction([
       this.prisma.position.findMany({
         where,

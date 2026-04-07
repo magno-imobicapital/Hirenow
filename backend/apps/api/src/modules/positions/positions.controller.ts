@@ -31,7 +31,12 @@ export class PositionsController {
   @Public()
   @Get()
   findAll(@Query() query: ListPositionsQuery) {
-    return this.positionsService.findAll(query.page, query.limit);
+    return this.positionsService.findAll(
+      query.page,
+      query.limit,
+      query.search,
+      query.employmentType,
+    );
   }
 
   @Get(':id')

@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { EmploymentType } from '@prisma/generated';
 
 export class ListPositionsQuery {
   @IsOptional()
@@ -14,4 +15,12 @@ export class ListPositionsQuery {
   @Min(1)
   @Max(25)
   limit: number = 10;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsEnum(EmploymentType)
+  employmentType?: EmploymentType;
 }

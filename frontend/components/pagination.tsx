@@ -4,14 +4,22 @@ type PaginationProps = {
   currentPage: number;
   totalPages: number;
   basePath: string;
+  query?: Record<string, string>;
 };
 
 export function Pagination({
   currentPage,
   totalPages,
   basePath,
+  query,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
+
+  function buildHref(page: number) {
+    const params = new URLSearchParams(query);
+    params.set("page", String(page));
+    return `${basePath}?${params}`;
+  }
 
   return (
     <nav className="mt-12 flex items-center justify-center gap-2">
@@ -20,7 +28,7 @@ export function Pagination({
         return (
           <Link
             key={n}
-            href={`${basePath}?page=${n}`}
+            href={buildHref(n)}
             className={
               active
                 ? "inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20"

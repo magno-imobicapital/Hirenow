@@ -24,16 +24,35 @@ type PositionsPage = {
 
 const PAGE_LIMIT = 9;
 
+const EMPLOYMENT_TYPES = [
+  { value: "CLT", label: "CLT" },
+  { value: "PJ", label: "PJ" },
+  { value: "FREELANCE", label: "Freelance" },
+  { value: "INTERNSHIP", label: "Estágio" },
+  { value: "TEMPORARY", label: "Temporário" },
+];
+
 export default async function PositionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    employmentType?: string;
+  }>;
 }) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
-  const res = await api<PositionsPage>(
-    `/positions?page=${page}&limit=${PAGE_LIMIT}`,
-  );
+  const search = params.search?.trim() || "";
+  const employmentType = params.employmentType || "";
+
+  const apiQuery = new URLSearchParams();
+  apiQuery.set("page", String(page));
+  apiQuery.set("limit", String(PAGE_LIMIT));
+  if (search) apiQuery.set("search", search);
+  if (employmentType) apiQuery.set("employmentType", employmentType);
+
+  const res = await api<PositionsPage>(`/positions?${apiQuery}`);
 
   if (!res.ok) {
     return (
@@ -118,6 +137,55 @@ export default async function PositionsPage({
 
       {/* Lista */}
       <section className="max-w-6xl mx-auto px-6 sm:px-10 py-14">
+        {/* Filtros */}
+        <form
+          method="get"
+          action="/positions"
+          className="mb-10 flex flex-col sm:flex-row gap-3"
+        >
+          <div className="relative flex-1">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              name="search"
+              defaultValue={search}
+              placeholder="Buscar por título ou descrição..."
+              className="w-full rounded-xl border border-border bg-background pl-11 pr-4 py-3.5 text-secondary outline-none transition-all duration-200 placeholder:text-muted-foreground/60 hover:border-secondary-light/40 focus:border-primary focus:ring-2 focus:ring-primary/15"
+            />
+          </div>
+          <select
+            name="employmentType"
+            defaultValue={employmentType}
+            className="rounded-xl border border-border bg-background px-4 py-3.5 text-secondary outline-none transition-all duration-200 hover:border-secondary-light/40 focus:border-primary focus:ring-2 focus:ring-primary/15 sm:w-56"
+          >
+            <option value="">Todos os modelos</option>
+            {EMPLOYMENT_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary/20 hover:bg-primary-dark transition-all"
+          >
+            Filtrar
+          </button>
+        </form>
+
         {items.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-secondary text-lg">
@@ -194,6 +262,10 @@ export default async function PositionsPage({
           currentPage={page}
           totalPages={totalPages}
           basePath="/positions"
+          query={{
+            ...(search && { search }),
+            ...(employmentType && { employmentType }),
+          }}
         />
       </section>
     </div>
