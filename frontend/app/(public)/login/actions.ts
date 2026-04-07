@@ -1,8 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { setAuthCookie } from "@/lib/auth-cookie";
+import { decodeAuthToken, setAuthCookie } from "@/lib/auth-cookie";
 import { api } from "@/lib/api";
+
+const REDIRECT_BY_ROLE = {
+  CANDIDATE: "/dashboard",
+  RECRUITER: "/recruiter/dashboard",
+  ADMIN: "/admin/dashboard",
+} as const;
 
 export async function loginAction(
   email: string,
@@ -17,7 +23,9 @@ export async function loginAction(
     return { error: response.error };
   }
 
+  const { role } = decodeAuthToken(response.data.acessToken);
+
   await setAuthCookie(response.data.acessToken);
 
-  redirect("/dashboard");
+  redirect(REDIRECT_BY_ROLE[role]);
 }
