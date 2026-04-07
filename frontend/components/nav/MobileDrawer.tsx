@@ -120,8 +120,8 @@ export default function MobileDrawer({
             {/* Header */}
             <div className="flex h-14 items-center justify-between px-6">
               <Image
-                src="/common/logos/logo.png"
-                alt="ImobiCapital"
+                src="/images/logo_white_blue.png"
+                alt="Hireme"
                 width={120}
                 height={30}
                 className="h-8 w-auto"

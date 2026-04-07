@@ -21,7 +21,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: Squares2X2Icon },
   { label: "Usuários", href: "/admin/usuarios", icon: UsersIcon },
   { label: "Empresas", href: "/admin/empresas", icon: BuildingOffice2Icon },
-  { label: "Vagas", href: "/admin/vagas", icon: BriefcaseIcon },
+  { label: "Vagas", href: "/admin/positions", icon: BriefcaseIcon },
   { label: "Relatórios", href: "/admin/relatorios", icon: ChartBarIcon },
   { label: "Configurações", href: "/admin/configuracoes", icon: Cog6ToothIcon },
 ];
