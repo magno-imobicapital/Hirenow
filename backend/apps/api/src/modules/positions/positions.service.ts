@@ -2,6 +2,9 @@ import { PrismaService } from '@app/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { EmploymentType, Prisma } from '@prisma/generated';
 import { CreatePositionDto } from './dto/create-position.dto';
+import { ManagePositionsQuery } from './dto/manage-positions.query';
+import { UpdatePositionDto } from './dto/update-position.dto';
+import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
 
 @Injectable()
 export class PositionsService {
@@ -89,5 +92,99 @@ export class PositionsService {
     ]);
 
     return { items, total, page, limit };
+  }
+
+  async findAllForManagement(query: ManagePositionsQuery, recruiterId: string) {
+    const { page, limit, search, employmentType, mine, isActive } = query;
+
+    const where: Prisma.PositionWhereInput = {
+      ...(typeof isActive === 'boolean' ? { isActive } : {}),
+      ...(employmentType ? { employmentType } : {}),
+      ...(mine ? { createdById: recruiterId } : {}),
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.position.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          employmentType: true,
+          location: true,
+          salaryMin: true,
+          salaryMax: true,
+          currency: true,
+          isActive: true,
+          createdAt: true,
+          createdBy: {
+            select: { id: true, email: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.position.count({ where }),
+    ]);
+
+    return { items, total, page, limit };
+  }
+
+  async update(id: string, dto: UpdatePositionDto) {
+    const exists = await this.prisma.position.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('Posição não encontrada');
+    }
+
+    return this.prisma.position.update({
+      where: { id },
+      data: dto,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        employmentType: true,
+        location: true,
+        salaryMin: true,
+        salaryMax: true,
+        currency: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async updateStatus(id: string, dto: UpdatePositionStatusDto) {
+    const exists = await this.prisma.position.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('Posição não encontrada');
+    }
+
+    return this.prisma.position.update({
+      where: { id },
+      data: { isActive: dto.isActive },
+      select: {
+        id: true,
+        isActive: true,
+      },
+    });
   }
 }
