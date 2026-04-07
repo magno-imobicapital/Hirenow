@@ -16,7 +16,14 @@
       "entryFile": "main",
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.app.json"
+        "tsConfigPath": "apps/api/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../libs/shared/src/mail/templates/**/*",
+            "outDir": "dist/apps/api/templates",
+            "watchAssets": true
+          }
+        ]
       }
     },
     "queue": {

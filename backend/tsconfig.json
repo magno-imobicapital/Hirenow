@@ -29,7 +29,7 @@
         "libs/shared/src/*"
       ],
       "@prisma/generated": [
-        "prisma/generated/prisma/client.ts"
+        "libs/shared/src/database/generated"
       ]
     }
   }

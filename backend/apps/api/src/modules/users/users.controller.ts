@@ -8,7 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/generated';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreateInternalUserDto } from './dto/create-internal-user.dto';
 import { UsersService } from './users.service';

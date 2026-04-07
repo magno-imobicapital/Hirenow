@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/generated';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 interface JwtPayload {

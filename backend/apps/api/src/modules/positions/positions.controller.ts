@@ -9,7 +9,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/generated';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreatePositionDto } from './dto/create-position.dto';

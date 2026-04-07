@@ -1,11 +1,12 @@
 import { BullModule } from '@nestjs/bull';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MAIL_QUEUE } from './constants';
 import { PrismaService } from './database/prisma.service';
 import { MailService } from './mail/mail.service';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({

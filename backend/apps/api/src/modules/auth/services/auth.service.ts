@@ -8,7 +8,7 @@ import * as argon2 from 'argon2';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { TokenService } from './token.service';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/generated';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +51,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    if (!user.active) {
+    if (!user.isActive) {
       throw new UnauthorizedException('Usuário desativado');
     }
 

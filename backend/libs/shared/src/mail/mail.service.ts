@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import type { Queue } from 'bull';
 import * as Mustache from 'mustache';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -15,7 +15,10 @@ export class MailService {
   }
 
   private loadTemplates() {
-    const templatesDir = path.join(__dirname, 'templates');
+    const templatesDir = path.join(
+      process.cwd(),
+      'libs/shared/src/mail/templates',
+    );
     const files = fs.readdirSync(templatesDir);
 
     for (const file of files) {
