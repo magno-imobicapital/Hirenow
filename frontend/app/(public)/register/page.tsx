@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "react-toastify";
+import { registerAction } from "./actions";
 
 const registerSchema = z
   .object({
     email: z.string().email("E-mail inválido"),
-    password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
+    password: z
+      .string()
+      .min(8, "Senha deve ter no mínimo 8 caracteres")
+      .max(72, "Senha deve ter no máximo 72 caracteres")
+      .regex(/[a-z]/, "Senha deve conter ao menos uma letra minúscula")
+      .regex(/[A-Z]/, "Senha deve conter ao menos uma letra maiúscula")
+      .regex(/[0-9]/, "Senha deve conter ao menos um número")
+      .regex(/[^A-Za-z0-9]/, "Senha deve conter ao menos um caractere especial"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -19,7 +27,11 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-    const { register, handleSubmit } = useForm<RegisterForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<RegisterForm>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -33,21 +45,12 @@ export default function RegisterPage() {
 
     const { email, password } = result.data;
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      toast.error(error.message);
+    const res = await registerAction(email, password);
+    console.log(res)
+    if (res?.error) {
+      toast.error(res.error);
       return;
     }
-
-    const { acessToken } = await response.json();
-    console.log(acessToken);
-    toast.success("Conta criada com sucesso!");
   }
 
   return (
@@ -225,9 +228,10 @@ export default function RegisterPage() {
             {/* Botão */}
             <button
               type="submit"
-              className="w-full rounded-xl bg-primary px-6 py-3.5 text-[0.95rem] font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/25 active:scale-[0.98] cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full rounded-xl bg-primary px-6 py-3.5 text-[0.95rem] font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-200 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/25 active:scale-[0.98] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Criar conta
+              {isSubmitting ? "Criando..." : "Criar conta"}
             </button>
           </form>
 
