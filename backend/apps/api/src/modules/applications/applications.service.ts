@@ -58,6 +58,48 @@ export class ApplicationsService {
     });
   }
 
+  async updateStatus(id: string, status: string) {
+    const application = await this.prisma.application.findUnique({
+      where: { id },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Candidatura não encontrada');
+    }
+
+    const updated = await this.prisma.application.update({
+      where: { id },
+      data: { status: status as any },
+    });
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      updatedAt: updated.updatedAt,
+    };
+  }
+
+  async withdraw(id: string, userId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: { id },
+    });
+
+    if (!application || application.userId !== userId) {
+      throw new NotFoundException('Candidatura não encontrada');
+    }
+
+    const updated = await this.prisma.application.update({
+      where: { id },
+      data: { status: 'WITHDRAWN' },
+    });
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      updatedAt: updated.updatedAt,
+    };
+  }
+
   async findAll() {
     return this.prisma.application.findMany({
       select: {
