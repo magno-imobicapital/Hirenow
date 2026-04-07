@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '@app/shared';
+import { MailService, PrismaService } from '@app/shared';
 import * as argon2 from 'argon2';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
@@ -15,6 +15,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -35,6 +36,8 @@ export class AuthService {
         role: UserRole.CANDIDATE,
       },
     });
+
+    await this.mailService.sendWelcome(user.email);
 
     return this.generateToken(user.id, user.email, user.role);
   }

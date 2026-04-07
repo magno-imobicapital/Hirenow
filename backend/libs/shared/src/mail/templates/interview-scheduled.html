@@ -1,0 +1,9 @@
+<h1>Entrevista agendada!</h1>
+<p>Olá, {{email}}!</p>
+<p>Uma entrevista foi marcada para a vaga <strong>{{positionTitle}}</strong>.</p>
+<p><strong>Título:</strong> {{interviewTitle}}</p>
+<p><strong>Data:</strong> {{scheduledAt}}</p>
+{{#meetingUrl}}
+<p><strong>Link da reunião:</strong> <a href="{{meetingUrl}}">{{meetingUrl}}</a></p>
+{{/meetingUrl}}
+<p>Boa sorte!</p>

@@ -1,14 +1,18 @@
-import { PrismaService } from '@app/shared';
+import { MailService, PrismaService } from '@app/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 
 @Injectable()
 export class InterviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async create(applicationId: string, dto: CreateInterviewDto) {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
+      include: { user: true, position: true },
     });
 
     if (!application) {
@@ -23,6 +27,14 @@ export class InterviewsService {
         scheduledAt: new Date(dto.scheduledAt),
       },
     });
+
+    await this.mailService.sendInterviewScheduled(
+      application.user.email,
+      application.position.title,
+      interview.title,
+      interview.scheduledAt.toISOString(),
+      interview.meetingUrl ?? undefined,
+    );
 
     return {
       id: interview.id,

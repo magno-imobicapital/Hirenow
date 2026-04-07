@@ -2,7 +2,9 @@ import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
+import { MAIL_QUEUE } from './constants';
 import { PrismaService } from './database/prisma.service';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -30,8 +32,10 @@ import { PrismaService } from './database/prisma.service';
         },
       }),
     }),
+
+    BullModule.registerQueue({ name: MAIL_QUEUE }),
   ],
-  providers: [PrismaService],
-  exports: [BullModule, PrismaService],
+  providers: [PrismaService, MailService],
+  exports: [BullModule, PrismaService, MailService],
 })
 export class SharedModule {}

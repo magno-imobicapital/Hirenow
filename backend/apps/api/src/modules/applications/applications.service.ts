@@ -3,11 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '@app/shared';
+import { MailService, PrismaService } from '@app/shared';
 
 @Injectable()
 export class ApplicationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailService: MailService,
+  ) {}
 
   async apply(positionId: string, userId: string) {
     const position = await this.prisma.position.findUnique({
@@ -26,9 +29,14 @@ export class ApplicationsService {
       throw new ConflictException('Você já se candidatou a esta vaga');
     }
 
-    const application = await this.prisma.application.create({
-      data: { userId, positionId },
-    });
+    const [application, user] = await Promise.all([
+      this.prisma.application.create({ data: { userId, positionId } }),
+      this.prisma.user.findUnique({ where: { id: userId } }),
+    ]);
+
+    if (user) {
+      await this.mailService.sendApplicationCreated(user.email, position.title);
+    }
 
     return {
       id: application.id,
@@ -61,6 +69,7 @@ export class ApplicationsService {
   async updateStatus(id: string, status: string) {
     const application = await this.prisma.application.findUnique({
       where: { id },
+      include: { user: true, position: true },
     });
 
     if (!application) {
@@ -71,6 +80,12 @@ export class ApplicationsService {
       where: { id },
       data: { status: status as any },
     });
+
+    await this.mailService.sendApplicationStatusUpdated(
+      application.user.email,
+      application.position.title,
+      status,
+    );
 
     return {
       id: updated.id,
