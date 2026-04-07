@@ -55,4 +55,28 @@ export class InterviewsService {
       orderBy: { scheduledAt: 'asc' },
     });
   }
+
+  async findByUser(userId: string) {
+    return this.prisma.interview.findMany({
+      where: { application: { userId } },
+      select: {
+        id: true,
+        title: true,
+        meetingUrl: true,
+        scheduledAt: true,
+        application: {
+          select: {
+            id: true,
+            position: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { scheduledAt: 'asc' },
+    });
+  }
 }
