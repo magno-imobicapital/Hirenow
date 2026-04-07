@@ -10,6 +10,28 @@ import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
 export class PositionsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getStats() {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const [openPositions, totalPositions, totalCandidates, newCandidatesThisWeek] =
+      await this.prisma.$transaction([
+        this.prisma.position.count({ where: { isActive: true } }),
+        this.prisma.position.count(),
+        this.prisma.application.count(),
+        this.prisma.application.count({
+          where: { createdAt: { gte: sevenDaysAgo } },
+        }),
+      ]);
+
+    return {
+      openPositions,
+      totalPositions,
+      totalCandidates,
+      newCandidatesThisWeek,
+    };
+  }
+
   async create(dto: CreatePositionDto, recruiterId: string) {
     const position = await this.prisma.position.create({
       data: {

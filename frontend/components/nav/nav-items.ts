@@ -28,7 +28,7 @@ const ADMIN_NAV: NavItem[] = [
 
 const RECRUITER_NAV: NavItem[] = [
   { label: "Dashboard", href: "/recruiter/dashboard", icon: Squares2X2Icon },
-  { label: "Vagas", href: "/recruiter/vagas", icon: BriefcaseIcon },
+  { label: "Vagas", href: "/recruiter/positions", icon: BriefcaseIcon },
   { label: "Candidatos", href: "/recruiter/candidatos", icon: UsersIcon },
   { label: "Configurações", href: "/recruiter/configuracoes", icon: Cog6ToothIcon },
 ];

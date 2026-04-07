@@ -27,6 +27,13 @@ type ManagedPositionsPage = {
   limit: number;
 };
 
+type PositionsStats = {
+  openPositions: number;
+  totalPositions: number;
+  totalCandidates: number;
+  newCandidatesThisWeek: number;
+};
+
 const PAGE_LIMIT = 9;
 
 export default async function RecruiterPositions({
@@ -52,7 +59,10 @@ export default async function RecruiterPositions({
   if (employmentType) apiQuery.set("employmentType", employmentType);
   if (mine) apiQuery.set("mine", "true");
 
-  const res = await api<ManagedPositionsPage>(`/positions/manage?${apiQuery}`);
+  const [res, statsRes] = await Promise.all([
+    api<ManagedPositionsPage>(`/positions/manage?${apiQuery}`),
+    api<PositionsStats>("/positions/stats"),
+  ]);
 
   if (!res.ok) {
     return (
@@ -64,7 +74,7 @@ export default async function RecruiterPositions({
 
   const { items, total, limit } = res.data;
   const totalPages = Math.max(1, Math.ceil(total / limit));
-  const openCount = items.filter((p) => p.isActive).length;
+  const stats = statsRes.ok ? statsRes.data : null;
 
   return (
     <div>
@@ -79,8 +89,14 @@ export default async function RecruiterPositions({
       />
       <PageStatistics
         statistics={[
-          { label: "Vagas abertas", value: openCount },
-          { label: "Total de vagas", value: total },
+          { label: "Vagas abertas", value: stats?.openPositions ?? 0 },
+          { label: "Total de vagas", value: stats?.totalPositions ?? total },
+          { label: "Total de candidatos", value: stats?.totalCandidates ?? 0 },
+          {
+            label: "Novos esta semana",
+            value: `+${stats?.newCandidatesThisWeek ?? 0}`,
+            highlight: true,
+          },
         ]}
       />
 

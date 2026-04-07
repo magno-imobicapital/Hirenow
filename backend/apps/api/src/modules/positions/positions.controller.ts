@@ -44,6 +44,12 @@ export class PositionsController {
   }
 
   @Roles(UserRole.RECRUITER)
+  @Get('stats')
+  getStats() {
+    return this.positionsService.getStats();
+  }
+
+  @Roles(UserRole.RECRUITER)
   @Get('manage')
   findAllForManagement(
     @Query() query: ManagePositionsQuery,
