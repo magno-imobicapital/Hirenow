@@ -46,9 +46,8 @@ export default function RegisterPage() {
     const { email, password } = result.data;
 
     const res = await registerAction(email, password);
-    console.log(res)
     if (res?.error) {
-      toast.error(res.error);
+      res.error.forEach((msg) => toast.error(msg));
       return;
     }
   }

@@ -7,22 +7,17 @@ import { api } from "@/lib/api";
 export async function registerAction(
   email: string,
   password: string,
-): Promise<{ error: string } | void> {
-  console.log("rodando...");
-  const response = await api("/auth/register", {
+): Promise<{ error: string[] } | void> {
+  const response = await api<{ acessToken: string }>("/auth/register", {
     method: "POST",
     body: { email, password },
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    return {
-      error: error.message ?? "Ocorreu um erro! Tente novamente mais tarde.",
-    };
+    return { error: response.error };
   }
 
-  const { acessToken } = await response.json();
-  await setAuthCookie(acessToken);
+  await setAuthCookie(response.data.acessToken);
 
   redirect("/dashboard");
 }
