@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+:root {
+  --primary: #0296D8;
+  --primary-light: #39B0E8;
+  --primary-dark: #0178AD;
+
+  --secondary: #36434C;
+  --secondary-light: #4E5D67;
+  --secondary-dark: #242E35;
+
+  --background: #FFFFFF;
+  --foreground: #36434C;
+
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+
+  --border: #E2E8F0;
+}
