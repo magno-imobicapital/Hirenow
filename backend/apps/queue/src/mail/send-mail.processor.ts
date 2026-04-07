@@ -3,7 +3,6 @@ import { Process, Processor } from '@nestjs/bull';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Job } from 'bull';
-import { Resend } from 'resend';
 
 export interface SendMailJobData {
   to: string | string[];
@@ -14,12 +13,13 @@ export interface SendMailJobData {
 @Processor(MAIL_QUEUE)
 export class SendMailProcessor {
   private readonly logger = new Logger(SendMailProcessor.name);
-  private readonly resend: Resend;
+  private readonly webhookUrl: string;
 
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {
-    this.resend = new Resend(this.configService.get<string>('RESEND_API_KEY'));
+    this.webhookUrl =
+      this.configService.getOrThrow<string>('MAIL_WEBHOOK_URL');
   }
 
   @Process()
@@ -28,16 +28,16 @@ export class SendMailProcessor {
 
     this.logger.log(`Sending email to ${to} — subject: "${subject}"`);
 
-    const { error } = await this.resend.emails.send({
-      from: 'HireNow <onboarding@resend.dev>',
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      html,
+    const response = await fetch(this.webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, subject, html }),
     });
 
-    if (error) {
-      this.logger.error(`Failed to send email: ${error.message}`);
-      throw new Error(error.message);
+    if (!response.ok) {
+      const body = await response.text();
+      this.logger.error(`Failed to send email: ${response.status} ${body}`);
+      throw new Error(`Mail webhook returned ${response.status}`);
     }
 
     this.logger.log(`Email sent to ${to}`);

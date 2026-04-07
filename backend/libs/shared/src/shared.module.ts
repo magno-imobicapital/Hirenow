@@ -34,7 +34,14 @@ import { MailService } from './mail/mail.service';
       }),
     }),
 
-    BullModule.registerQueue({ name: MAIL_QUEUE }),
+    // TODO: criar uma DLQ pra capturar jobs que esgotarem as 3 tentativas
+    BullModule.registerQueue({
+      name: MAIL_QUEUE,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
+      },
+    }),
   ],
   providers: [PrismaService, MailService],
   exports: [BullModule, PrismaService, MailService],
