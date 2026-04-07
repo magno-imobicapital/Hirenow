@@ -16,6 +16,7 @@ import { PrismaService } from './database/prisma.service';
         REDIS_PASSWORD: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
+        BLOB_READ_WRITE_TOKEN: Joi.string().required(),
       }),
     }),
 
