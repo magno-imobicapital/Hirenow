@@ -34,7 +34,6 @@ export class PositionsController {
     return this.positionsService.findAll(query.page, query.limit);
   }
 
-  @Public()
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.positionsService.findOne(id);

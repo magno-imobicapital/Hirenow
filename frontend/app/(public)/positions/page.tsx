@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { formatDate, formatSalary } from "@/lib/format";
+import { Pagination } from "@/components/pagination";
 
 type Position = {
   id: string;
@@ -20,39 +22,15 @@ type PositionsPage = {
   limit: number;
 };
 
-const PAGE_LIMIT = 10;
-
-function formatSalary(p: Position) {
-  if (p.salaryMin == null && p.salaryMax == null) return null;
-  const currency = p.currency ?? "BRL";
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(n);
-  if (p.salaryMin != null && p.salaryMax != null)
-    return `${fmt(p.salaryMin)} – ${fmt(p.salaryMax)}`;
-  if (p.salaryMin != null) return `A partir de ${fmt(p.salaryMin)}`;
-  return `Até ${fmt(p.salaryMax!)}`;
-}
-
-function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(iso));
-}
+const PAGE_LIMIT = 9;
 
 export default async function PositionsPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const sp = await searchParams;
-  const page = Math.max(1, Number(sp.page) || 1);
-
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
   const res = await api<PositionsPage>(
     `/positions?page=${page}&limit=${PAGE_LIMIT}`,
   );
@@ -73,7 +51,6 @@ export default async function PositionsPage({
       className="min-h-dvh bg-background"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap"
@@ -110,7 +87,8 @@ export default async function PositionsPage({
             "linear-gradient(145deg, #0296D8 0%, #0178AD 50%, #242E35 100%)",
         }}
       >
-        <div className="absolute inset-0 opacity-[0.04]"
+        <div
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage:
               "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
@@ -147,15 +125,15 @@ export default async function PositionsPage({
             </p>
           </div>
         ) : (
-          <ul className="space-y-4">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {items.map((p) => {
               const salary = formatSalary(p);
               return (
                 <li
                   key={p.id}
-                  className="group rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200"
+                  className="group rounded-2xl border border-border bg-background hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200 flex flex-col"
                 >
-                  <article className="p-6 sm:p-7">
+                  <article className="p-6 flex flex-col h-full">
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <h2
                         className="text-secondary-dark text-xl sm:text-[1.4rem] font-semibold leading-tight tracking-tight"
@@ -182,13 +160,13 @@ export default async function PositionsPage({
                       )}
                     </div>
 
-                    <p className="text-muted-foreground text-[0.95rem] leading-relaxed line-clamp-3 mb-5">
+                    <p className="text-muted-foreground text-[0.9rem] leading-relaxed line-clamp-3 mb-5 flex-1">
                       {p.description}
                     </p>
 
                     <Link
                       href="/login"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-dark transition-colors mt-auto"
                     >
                       Candidatar-se
                       <svg
@@ -212,27 +190,11 @@ export default async function PositionsPage({
           </ul>
         )}
 
-        {/* Paginação */}
-        {totalPages > 1 && (
-          <nav className="mt-12 flex items-center justify-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => {
-              const active = n === page;
-              return (
-                <Link
-                  key={n}
-                  href={`/positions?page=${n}`}
-                  className={
-                    active
-                      ? "inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20"
-                      : "inline-flex items-center justify-center min-w-10 h-10 px-3 rounded-xl border border-border text-sm font-medium text-secondary hover:border-primary/40 hover:text-primary transition-colors"
-                  }
-                >
-                  {n}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          basePath="/positions"
+        />
       </section>
     </div>
   );

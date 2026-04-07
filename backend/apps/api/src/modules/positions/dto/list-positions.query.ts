@@ -12,6 +12,6 @@ export class ListPositionsQuery {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(50)
+  @Max(25)
   limit: number = 10;
 }
