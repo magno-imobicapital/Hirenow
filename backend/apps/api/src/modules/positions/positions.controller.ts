@@ -7,12 +7,14 @@ import {
   ParseUUIDPipe,
   HttpStatus,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/generated';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreatePositionDto } from './dto/create-position.dto';
+import { ListPositionsQuery } from './dto/list-positions.query';
 import { PositionsService } from './positions.service';
 
 @Controller('positions')
@@ -28,8 +30,8 @@ export class PositionsController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.positionsService.findAll();
+  findAll(@Query() query: ListPositionsQuery) {
+    return this.positionsService.findAll(query.page, query.limit);
   }
 
   @Public()

@@ -48,21 +48,29 @@ export class PositionsService {
     return position;
   }
 
-  async findAll() {
-    return this.prisma.position.findMany({
-      where: { isActive: true },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        employmentType: true,
-        location: true,
-        salaryMin: true,
-        salaryMax: true,
-        currency: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(page: number, limit: number) {
+    const where = { isActive: true };
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.position.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          employmentType: true,
+          location: true,
+          salaryMin: true,
+          salaryMax: true,
+          currency: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.position.count({ where }),
+    ]);
+
+    return { items, total, page, limit };
   }
 }
