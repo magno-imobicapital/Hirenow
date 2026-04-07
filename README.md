@@ -1,4 +1,4 @@
-# HireNow - Sistema de Recrutamento
+# Hireme - Sistema de Recrutamento
 
 Solucao para o desafio tecnico de Desenvolvedor Junior: otimizar o processo de recrutamento do setor de RH, centralizando dados de candidatos, automatizando notificacoes e integrando com ferramentas corporativas.
 

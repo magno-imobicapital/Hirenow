@@ -31,13 +31,17 @@ export class MailService {
   private render(template: string, data: Record<string, unknown>): string {
     const tpl = this.templates.get(template);
     if (!tpl) throw new Error(`Template "${template}" não encontrado`);
-    return Mustache.render(tpl, data);
+    return Mustache.render(tpl, {
+      logoUrl:
+        'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/logo_white.png',
+      ...data,
+    });
   }
 
   async sendWelcome(email: string) {
     await this.mailQueue.add({
       to: email,
-      subject: 'Bem-vindo ao HireNow!',
+      subject: 'Bem-vindo ao Hireme!',
       html: this.render('welcome', { email }),
     });
   }

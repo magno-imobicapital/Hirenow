@@ -1,4 +1,105 @@
-<h1>Atualização na sua candidatura</h1>
-<p>Olá, {{email}}!</p>
-<p>O status da sua candidatura para <strong>{{positionTitle}}</strong> foi atualizado para: <strong>{{status}}</strong>.</p>
-<p>Acesse a plataforma para mais detalhes.</p>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Atualização na candidatura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      body { margin: 0; padding: 0; background: #f4f6f8; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+      table { border-collapse: collapse; }
+      a { color: #0296D8; text-decoration: none; }
+      @media (max-width: 620px) {
+        .container { width: 100% !important; }
+        .px { padding-left: 28px !important; padding-right: 28px !important; }
+        .h1 { font-size: 26px !important; line-height: 1.2 !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;">
+      <tr>
+        <td align="center" style="padding: 40px 16px;">
+          <table role="presentation" width="600" class="container" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(36,46,53,0.08);">
+
+            <tr>
+              <td style="background:linear-gradient(145deg,#0296D8 0%,#0178AD 50%,#242E35 100%);padding:40px 48px 56px 48px;" class="px">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <img src="{{logoUrl}}" alt="Hireme" height="22" style="display:block;height:22px;width:auto;border:0;outline:none;text-decoration:none;" />
+                    </td>
+                    <td align="right">
+                      <span style="display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.14);color:rgba(255,255,255,0.85);font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;">Atualização</span>
+                    </td>
+                  </tr>
+                </table>
+                <div style="height:48px;line-height:48px;font-size:0;">&nbsp;</div>
+                <h1 class="h1" style="margin:0;font-family:'Outfit',sans-serif;color:#ffffff;font-size:32px;line-height:1.15;font-weight:700;letter-spacing:-0.02em;">Sua candidatura<br/>foi atualizada.</h1>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:48px 48px 8px 48px;">
+                <p style="margin:0 0 18px 0;font-size:15px;line-height:1.65;color:#242E35;">Olá <strong style="color:#0178AD;">{{email}}</strong>,</p>
+                <p style="margin:0 0 28px 0;font-size:15px;line-height:1.65;color:#4a5862;">Há uma novidade no andamento do seu processo seletivo.</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:0 48px 16px 48px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f9fb;border:1px solid #e6ebf0;border-left:3px solid #0296D8;border-radius:12px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <p style="margin:0 0 6px 0;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:#8a96a0;letter-spacing:0.1em;text-transform:uppercase;">Vaga</p>
+                      <p style="margin:0;font-family:'Outfit',sans-serif;font-size:18px;font-weight:600;color:#242E35;letter-spacing:-0.01em;">{{positionTitle}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:0 48px 32px 48px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="padding:18px 22px;background:#242E35;border-radius:12px;">
+                      <p style="margin:0 0 4px 0;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;">Novo status</p>
+                      <p style="margin:0;font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.01em;">{{status}}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:0 48px 48px 48px;">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="border-radius:12px;background:#0296D8;box-shadow:0 8px 24px rgba(2,150,216,0.28);">
+                      <a href="https://hireme.app/dashboard" style="display:inline-block;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px;">Ver detalhes →</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:0 48px;">
+                <div style="height:1px;background:linear-gradient(90deg,transparent,#e6ebf0,transparent);"></div>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="px" style="padding:28px 48px 40px 48px;">
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#8a96a0;">Você está recebendo este e-mail por ser candidato em um processo no Hireme.</p>
+                <p style="margin:14px 0 0 0;font-family:'Outfit',sans-serif;font-size:11px;color:#8a96a0;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;">Hireme · Recrutamento sem ruído</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
