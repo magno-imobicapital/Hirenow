@@ -1,15 +1,15 @@
-"use client";
-
 import Image from "next/image";
+import Link from "next/link";
+
+type ActionButton =
+  | { label: string; href: string; onClick?: never }
+  | { label: string; onClick: () => void; href?: never };
 
 type PageHeaderProps = {
   pageName: string;
   pageTitle: string;
   pageDescription: string;
-  actionButton?: {
-    label: string;
-    onClick: () => void;
-  };
+  actionButton?: ActionButton;
 };
 
 export default function PageHeader({
@@ -42,13 +42,22 @@ export default function PageHeader({
         </div>
 
         {actionButton ? (
-          <button
-            type="button"
-            onClick={actionButton.onClick}
-            className="shrink-0 self-start sm:self-end inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark transition-colors"
-          >
-            {actionButton.label}
-          </button>
+          actionButton.href ? (
+            <Link
+              href={actionButton.href}
+              className="shrink-0 self-start sm:self-end inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark transition-colors"
+            >
+              {actionButton.label}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={actionButton.onClick}
+              className="shrink-0 self-start sm:self-end inline-flex items-center justify-center rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark transition-colors"
+            >
+              {actionButton.label}
+            </button>
+          )
         ) : null}
       </div>
     </header>

@@ -14,7 +14,7 @@ export default function PageStatistics({ statistics }: PageStatisticsProps) {
       {statistics.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl border border-border bg-background px-6 py-5"
+          className="rounded-xl border border-border bg-primary/5 px-6 py-5"
         >
           <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             {stat.label}

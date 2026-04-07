@@ -1,10 +1,71 @@
-"use client";
-
 import PageHeader from "@/components/page-header";
 import PageStatistics from "@/components/page-statistics";
+import { Pagination } from "@/components/pagination";
+import { api } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import PositionCard from "./_components/position-card";
+import PositionsFilters from "./_components/positions-filters";
 
-export default function RecruiterPositions() {
+type ManagedPosition = {
+  id: string;
+  title: string;
+  description: string;
+  employmentType: string;
+  location: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  currency: string | null;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: { id: string; email: string };
+};
+
+type ManagedPositionsPage = {
+  items: ManagedPosition[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+const PAGE_LIMIT = 9;
+
+export default async function RecruiterPositions({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    employmentType?: string;
+    mine?: string;
+  }>;
+}) {
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
+  const search = params.search?.trim() || "";
+  const employmentType = params.employmentType || "";
+  const mine = params.mine === "true";
+
+  const apiQuery = new URLSearchParams();
+  apiQuery.set("page", String(page));
+  apiQuery.set("limit", String(PAGE_LIMIT));
+  if (search) apiQuery.set("search", search);
+  if (employmentType) apiQuery.set("employmentType", employmentType);
+  if (mine) apiQuery.set("mine", "true");
+
+  const res = await api<ManagedPositionsPage>(`/positions/manage?${apiQuery}`);
+
+  if (!res.ok) {
+    return (
+      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto mt-8">
+        <p className="text-secondary">Erro ao carregar vagas.</p>
+      </div>
+    );
+  }
+
+  const { items, total, limit } = res.data;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const openCount = items.filter((p) => p.isActive).length;
+
   return (
     <div>
       <PageHeader
@@ -13,28 +74,50 @@ export default function RecruiterPositions() {
         pageDescription="Gerencie posições abertas, acompanhe o pipeline de candidatos e mantenha tudo em movimento."
         actionButton={{
           label: "+ Nova vaga",
-          onClick: () => alert("Hello World!"),
+          href: "/recruiter/positions/new",
         }}
       />
       <PageStatistics
         statistics={[
-          { label: "Vagas abertas", value: 2 },
-          { label: "Total de candidatos", value: 151 },
-          { label: "Novos esta semana", value: "+10", highlight: true },
+          { label: "Vagas abertas", value: openCount },
+          { label: "Total de vagas", value: total },
         ]}
       />
-      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto mt-8">
-        <PositionCard
-          title="Desenvolvedor(a) Front-end Sênior"
-          location="Remoto • Brasil"
-          contractType="CLT"
-          candidatesCount={42}
-          newCandidatesCount={7}
-          status="open"
-          publishedAt="12 mar 2026"
-          onViewPipeline={() => alert("Ver pipeline")}
-          onEdit={() => alert("Editar")}
-          onMore={() => alert("Mais opções")}
+
+      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto mt-8 mb-8">
+        <PositionsFilters
+          search={search}
+          employmentType={employmentType}
+          mine={mine}
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {items.length === 0 ? (
+            <p className="text-muted-foreground">Nenhuma vaga encontrada.</p>
+          ) : (
+            items.map((p) => (
+              <PositionCard
+                key={p.id}
+                title={p.title}
+                location={p.location}
+                contractType={p.employmentType}
+                candidatesCount={0}
+                status={p.isActive ? "open" : "closed"}
+                publishedAt={formatDate(p.createdAt)}
+              />
+            ))
+          )}
+        </div>
+
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          basePath="/recruiter/positions"
+          query={{
+            ...(search && { search }),
+            ...(employmentType && { employmentType }),
+            ...(mine && { mine: "true" }),
+          }}
         />
       </div>
     </div>

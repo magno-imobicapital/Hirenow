@@ -8,7 +8,6 @@ type PositionCardProps = {
   publishedAt: string;
   onViewPipeline?: () => void;
   onEdit?: () => void;
-  onMore?: () => void;
 };
 
 const statusLabels: Record<PositionCardProps["status"], string> = {
@@ -18,9 +17,9 @@ const statusLabels: Record<PositionCardProps["status"], string> = {
 };
 
 const statusStyles: Record<PositionCardProps["status"], string> = {
-  open: "bg-green-50 text-green-700",
-  paused: "bg-yellow-50 text-yellow-700",
-  closed: "bg-muted text-muted-foreground",
+  open: "bg-green-100 text-green-800",
+  paused: "bg-yellow-100 text-yellow-800",
+  closed: "bg-slate-200 text-slate-700",
 };
 
 const statusDot: Record<PositionCardProps["status"], string> = {
@@ -39,10 +38,9 @@ export default function PositionCard({
   publishedAt,
   onViewPipeline,
   onEdit,
-  onMore,
 }: PositionCardProps) {
   return (
-    <article className="flex flex-col gap-4 rounded-xl border border-border bg-background p-6 transition-shadow hover:shadow-md lg:flex-row lg:items-center lg:justify-between">
+    <article className="flex h-full flex-col gap-5 rounded-xl border border-border bg-primary/5 p-6 transition-shadow hover:shadow-md">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -52,7 +50,7 @@ export default function PositionCard({
             {statusLabels[status]}
           </span>
 
-          <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary">
+          <span className="inline-flex items-center rounded-full bg-secondary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-dark">
             {contractType}
           </span>
 
@@ -101,8 +99,8 @@ export default function PositionCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-5">
-        <div className="flex flex-col items-center">
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
+        <div className="flex items-baseline gap-1.5">
           <span className="text-2xl font-extrabold text-secondary-dark">
             {candidatesCount}
           </span>
@@ -111,10 +109,11 @@ export default function PositionCard({
           </span>
         </div>
 
+        <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onViewPipeline}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors whitespace-nowrap"
         >
           Ver pipeline
           <span aria-hidden>→</span>
@@ -124,7 +123,7 @@ export default function PositionCard({
           type="button"
           onClick={onEdit}
           aria-label="Editar vaga"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-secondary hover:bg-muted transition-colors"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-secondary/15 text-secondary-dark hover:bg-secondary/25 transition-colors"
         >
           <svg
             className="h-4 w-4"
@@ -140,18 +139,7 @@ export default function PositionCard({
           </svg>
         </button>
 
-        <button
-          type="button"
-          onClick={onMore}
-          aria-label="Mais opções"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-secondary hover:bg-muted transition-colors"
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="5" r="1.5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <circle cx="12" cy="19" r="1.5" />
-          </svg>
-        </button>
+        </div>
       </div>
     </article>
   );
