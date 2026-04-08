@@ -62,6 +62,7 @@ export class PositionsController {
     return this.positionsService.findAllForManagement(query, req.user.id);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.positionsService.findOne(id);

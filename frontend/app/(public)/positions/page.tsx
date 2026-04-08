@@ -233,10 +233,10 @@ export default async function PositionsPage({
                     </p>
 
                     <Link
-                      href="/login"
+                      href={`/positions/${p.id}`}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-dark transition-colors mt-auto"
                     >
-                      Candidatar-se
+                      Ver vaga
                       <svg
                         width="14"
                         height="14"
