@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type PositionCardProps = {
   title: string;
@@ -8,7 +9,7 @@ type PositionCardProps = {
   newCandidatesCount?: number;
   status: "open" | "paused" | "closed";
   publishedAt: string;
-  onViewPipeline?: () => void;
+  pipelineHref?: string;
   editSlot?: ReactNode;
   statusToggleSlot?: ReactNode;
 };
@@ -39,7 +40,7 @@ export default function PositionCard({
   newCandidatesCount,
   status,
   publishedAt,
-  onViewPipeline,
+  pipelineHref,
   editSlot,
   statusToggleSlot,
 }: PositionCardProps) {
@@ -115,14 +116,15 @@ export default function PositionCard({
         </div>
 
         <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onViewPipeline}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors whitespace-nowrap"
-        >
-          Ver pipeline
-          <span aria-hidden>→</span>
-        </button>
+        {pipelineHref ? (
+          <Link
+            href={pipelineHref}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors whitespace-nowrap"
+          >
+            Ver pipeline
+            <span aria-hidden>→</span>
+          </Link>
+        ) : null}
 
         {editSlot}
 

@@ -130,6 +130,7 @@ export default async function RecruiterPositions({
                 newCandidatesCount={p.newApplicationsCount}
                 status={p.isActive ? "open" : "closed"}
                 publishedAt={formatDate(p.createdAt)}
+                pipelineHref={`/recruiter/positions/${p.id}`}
                 statusToggleSlot={
                   <TogglePositionActiveButton
                     positionId={p.id}
