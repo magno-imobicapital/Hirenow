@@ -211,7 +211,14 @@ export class PositionsService {
             id: true,
             email: true,
             profile: {
-              select: { fullName: true },
+              select: {
+                fullName: true,
+                about: true,
+                mobilePhone: true,
+                landlinePhone: true,
+                salaryExpectation: true,
+                resumeUrl: true,
+              },
             },
           },
         },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import StatusSelect from "./_components/status-select";
+import CandidateProfileButton from "./_components/candidate-profile-button";
 
 type ApplicationStatus =
   | "PENDING"
@@ -12,6 +13,15 @@ type ApplicationStatus =
   | "HIRED"
   | "REJECTED";
 
+type CandidateProfile = {
+  fullName: string | null;
+  about: string | null;
+  mobilePhone: string | null;
+  landlinePhone: string | null;
+  salaryExpectation: number | string | null;
+  resumeUrl: string | null;
+};
+
 type PipelineApplication = {
   id: string;
   status: ApplicationStatus;
@@ -20,7 +30,7 @@ type PipelineApplication = {
   user: {
     id: string;
     email: string;
-    profile: { fullName: string } | null;
+    profile: CandidateProfile | null;
   };
 };
 
@@ -136,6 +146,12 @@ export default async function PositionPipelinePage({
                       <p className="mt-2 text-[11px] text-muted-foreground">
                         Candidatou-se em {formatDate(app.createdAt)}
                       </p>
+                      <div className="mt-2">
+                        <CandidateProfileButton
+                          email={app.user.email}
+                          profile={app.user.profile}
+                        />
+                      </div>
                       <div className="mt-3">
                         <StatusSelect
                           applicationId={app.id}
