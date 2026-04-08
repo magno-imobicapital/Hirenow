@@ -94,7 +94,7 @@ enum ApplicationStatus {
 model CandidateProfile {
   id String @id @default(uuid())
 
-  fullName          String    @map("full_name")
+  fullName          String?   @map("full_name")
   birthDate         DateTime? @map("birth_date") @db.Date
   about             String?
   mobilePhone       String?   @map("mobile_phone")

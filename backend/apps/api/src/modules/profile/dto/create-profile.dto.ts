@@ -7,8 +7,9 @@ import {
 } from 'class-validator';
 
 export class CreateProfileDto {
+  @IsOptional()
   @IsString()
-  fullName: string;
+  fullName?: string;
 
   @IsOptional()
   @IsDateString({}, { message: 'Data de nascimento inválida' })

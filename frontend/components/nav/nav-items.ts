@@ -38,7 +38,7 @@ const CANDIDATE_NAV: NavItem[] = [
   { label: "Vagas", href: "/positions", icon: BriefcaseIcon },
   { label: "Candidaturas", href: "/candidaturas", icon: ClipboardDocumentListIcon },
   { label: "Currículo", href: "/curriculo", icon: DocumentTextIcon },
-  { label: "Perfil", href: "/perfil", icon: UserCircleIcon },
+  { label: "Perfil", href: "/profile", icon: UserCircleIcon },
 ];
 
 export function getNavItems(role: UserRole | null | undefined): NavItem[] {

@@ -66,12 +66,14 @@ export class ProfileService {
   }
 
   async uploadResume(file: Express.Multer.File, userId: string) {
-    const profile = await this.prisma.candidateProfile.findUnique({
+    let profile = await this.prisma.candidateProfile.findUnique({
       where: { userId },
     });
 
     if (!profile) {
-      throw new NotFoundException('Perfil não encontrado');
+      profile = await this.prisma.candidateProfile.create({
+        data: { userId },
+      });
     }
 
     if (file.mimetype !== 'application/pdf') {
