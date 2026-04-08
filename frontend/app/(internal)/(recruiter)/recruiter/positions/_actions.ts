@@ -30,6 +30,19 @@ export async function createPositionAction(input: CreatePositionInput) {
 
 export type UpdatePositionInput = Omit<CreatePositionInput, "isActive">;
 
+export async function togglePositionActiveAction(
+  id: string,
+  isActive: boolean,
+) {
+  const res = await api(`/positions/${id}/status`, {
+    method: "PATCH",
+    body: { isActive },
+  });
+  if (!res.ok) return { ok: false as const, error: res.error };
+  revalidatePath("/recruiter/positions");
+  return { ok: true as const };
+}
+
 export async function updatePositionAction(
   id: string,
   input: UpdatePositionInput,

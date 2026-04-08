@@ -251,6 +251,24 @@ export class PositionsService {
     });
   }
 
+  async archive(id: string) {
+    const exists = await this.prisma.position.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!exists) {
+      throw new NotFoundException('Posição não encontrada');
+    }
+
+    await this.prisma.position.update({
+      where: { id },
+      data: { isActive: false },
+    });
+
+    return { id, isActive: false };
+  }
+
   async updateStatus(id: string, dto: UpdatePositionStatusDto) {
     const exists = await this.prisma.position.findUnique({
       where: { id },

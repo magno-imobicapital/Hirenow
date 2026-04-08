@@ -10,6 +10,7 @@ type PositionCardProps = {
   publishedAt: string;
   onViewPipeline?: () => void;
   editSlot?: ReactNode;
+  statusToggleSlot?: ReactNode;
 };
 
 const statusLabels: Record<PositionCardProps["status"], string> = {
@@ -40,16 +41,18 @@ export default function PositionCard({
   publishedAt,
   onViewPipeline,
   editSlot,
+  statusToggleSlot,
 }: PositionCardProps) {
   return (
     <article className="flex h-full flex-col gap-5 rounded-xl border border-border bg-primary/5 p-6 transition-shadow hover:shadow-md">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${statusStyles[status]}`}
+            className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${statusStyles[status]}`}
           >
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot[status]}`} />
             {statusLabels[status]}
+            {statusToggleSlot}
           </span>
 
           <span className="inline-flex items-center rounded-full bg-secondary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-dark">

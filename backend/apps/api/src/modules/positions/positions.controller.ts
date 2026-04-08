@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -79,6 +80,12 @@ export class PositionsController {
     @Body() dto: UpdatePositionDto,
   ) {
     return this.positionsService.update(id, dto);
+  }
+
+  @Roles(UserRole.RECRUITER)
+  @Delete(':id')
+  archive(@Param('id', ParseUUIDPipe) id: string) {
+    return this.positionsService.archive(id);
   }
 
   @Roles(UserRole.RECRUITER)

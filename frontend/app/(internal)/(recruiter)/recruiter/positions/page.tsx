@@ -7,6 +7,7 @@ import PositionCard from "./_components/position-card";
 import PositionsFilters from "./_components/positions-filters";
 import NewPositionButton from "./_components/new-position-button";
 import EditPositionButton from "./_components/edit-position-button";
+import TogglePositionActiveButton from "./_components/archive-position-button";
 import PositionsEmptyState from "./_components/positions-empty-state";
 
 type ManagedPosition = {
@@ -127,6 +128,12 @@ export default async function RecruiterPositions({
                 candidatesCount={p._count.applications}
                 status={p.isActive ? "open" : "closed"}
                 publishedAt={formatDate(p.createdAt)}
+                statusToggleSlot={
+                  <TogglePositionActiveButton
+                    positionId={p.id}
+                    isActive={p.isActive}
+                  />
+                }
                 editSlot={
                   <EditPositionButton
                     position={{
