@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import StatusSelect from "./_components/status-select";
 
 type ApplicationStatus =
   | "PENDING"
@@ -8,7 +9,8 @@ type ApplicationStatus =
   | "INTERVIEW"
   | "TECHNICAL_INTERVIEW"
   | "WITHDRAWN"
-  | "HIRED";
+  | "HIRED"
+  | "REJECTED";
 
 type PipelineApplication = {
   id: string;
@@ -34,6 +36,7 @@ const STATUS_ORDER: ApplicationStatus[] = [
   "INTERVIEW",
   "TECHNICAL_INTERVIEW",
   "HIRED",
+  "REJECTED",
   "WITHDRAWN",
 ];
 
@@ -43,6 +46,7 @@ const STATUS_LABELS: Record<ApplicationStatus, string> = {
   INTERVIEW: "Entrevista",
   TECHNICAL_INTERVIEW: "Entrevista técnica",
   HIRED: "Contratados",
+  REJECTED: "Reprovados",
   WITHDRAWN: "Desistentes",
 };
 
@@ -52,6 +56,7 @@ const STATUS_COLORS: Record<ApplicationStatus, string> = {
   INTERVIEW: "bg-amber-100 text-amber-700",
   TECHNICAL_INTERVIEW: "bg-purple-100 text-purple-700",
   HIRED: "bg-green-100 text-green-700",
+  REJECTED: "bg-orange-100 text-orange-700",
   WITHDRAWN: "bg-red-100 text-red-700",
 };
 
@@ -131,6 +136,13 @@ export default async function PositionPipelinePage({
                       <p className="mt-2 text-[11px] text-muted-foreground">
                         Candidatou-se em {formatDate(app.createdAt)}
                       </p>
+                      <div className="mt-3">
+                        <StatusSelect
+                          applicationId={app.id}
+                          positionId={position.id}
+                          currentStatus={app.status}
+                        />
+                      </div>
                     </article>
                   ))
                 )}

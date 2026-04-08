@@ -6,6 +6,7 @@ const RECRUITER_STATUSES = [
   'INTERVIEW',
   'TECHNICAL_INTERVIEW',
   'HIRED',
+  'REJECTED',
 ] as const;
 
 export class UpdateStatusDto {

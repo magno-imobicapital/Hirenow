@@ -84,9 +84,7 @@ enum ApplicationStatus {
   TECHNICAL_INTERVIEW
   WITHDRAWN
   HIRED
-  // TODO: Adicionar futuramente
-  // OFFERED
-  // REJECTED
+  REJECTED
 
   @@schema("recruitment")
 }

@@ -10,7 +10,8 @@ type ApplicationStatus =
   | "INTERVIEW"
   | "TECHNICAL_INTERVIEW"
   | "WITHDRAWN"
-  | "HIRED";
+  | "HIRED"
+  | "REJECTED";
 
 type Application = {
   id: string;
@@ -31,6 +32,7 @@ const STATUS_LABELS: Record<ApplicationStatus, string> = {
   TECHNICAL_INTERVIEW: "Entrevista técnica",
   WITHDRAWN: "Desistente",
   HIRED: "Contratado",
+  REJECTED: "Reprovado",
 };
 
 const STATUS_STYLES: Record<ApplicationStatus, string> = {
@@ -40,6 +42,7 @@ const STATUS_STYLES: Record<ApplicationStatus, string> = {
   TECHNICAL_INTERVIEW: "bg-purple-100 text-purple-700",
   WITHDRAWN: "bg-red-100 text-red-700",
   HIRED: "bg-green-100 text-green-700",
+  REJECTED: "bg-orange-100 text-orange-700",
 };
 
 export default async function ApplicationsPage() {
@@ -109,7 +112,7 @@ export default async function ApplicationsPage() {
                 >
                   Ver vaga
                 </Link>
-                {app.status !== "WITHDRAWN" && app.status !== "HIRED" ? (
+                {app.status !== "WITHDRAWN" && app.status !== "HIRED" && app.status !== "REJECTED" ? (
                   <WithdrawButton
                     applicationId={app.id}
                     positionTitle={app.position.title}

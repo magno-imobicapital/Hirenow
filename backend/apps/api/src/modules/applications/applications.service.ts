@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -74,6 +75,13 @@ export class ApplicationsService {
 
     if (!application) {
       throw new NotFoundException('Candidatura não encontrada');
+    }
+
+    const TERMINAL_STATUSES = ['WITHDRAWN', 'HIRED', 'REJECTED'];
+    if (TERMINAL_STATUSES.includes(application.status)) {
+      throw new BadRequestException(
+        'Não é possível alterar o status de uma candidatura encerrada',
+      );
     }
 
     const updated = await this.prisma.application.update({
