@@ -150,6 +150,9 @@ export class PositionsService {
           createdBy: {
             select: { id: true, email: true },
           },
+          _count: {
+            select: { applications: true },
+          },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,

@@ -18,6 +18,7 @@ type ManagedPosition = {
   isActive: boolean;
   createdAt: string;
   createdBy: { id: string; email: string };
+  _count: { applications: number };
 };
 
 type ManagedPositionsPage = {
@@ -117,7 +118,7 @@ export default async function RecruiterPositions({
                 title={p.title}
                 location={p.location}
                 contractType={p.employmentType}
-                candidatesCount={0}
+                candidatesCount={p._count.applications}
                 status={p.isActive ? "open" : "closed"}
                 publishedAt={formatDate(p.createdAt)}
               />
