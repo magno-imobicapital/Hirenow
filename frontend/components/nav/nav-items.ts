@@ -35,7 +35,7 @@ const RECRUITER_NAV: NavItem[] = [
 
 const CANDIDATE_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: Squares2X2Icon },
-  { label: "Vagas", href: "/positions", icon: BriefcaseIcon },
+  { label: "Vagas", href: "/dashboard/positions", icon: BriefcaseIcon },
   { label: "Candidaturas", href: "/candidaturas", icon: ClipboardDocumentListIcon },
   { label: "Currículo", href: "/curriculo", icon: DocumentTextIcon },
   { label: "Perfil", href: "/profile", icon: UserCircleIcon },

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { decodeAuthToken, getAuthCookie } from "@/lib/auth-cookie";
 import { formatDate, formatSalary } from "@/lib/format";
+import ApplyButton from "./_components/apply-button";
 
 type Position = {
   id: string;
@@ -21,7 +23,12 @@ export default async function PositionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const res = await api<Position>(`/positions/${id}`);
+  const [res, token] = await Promise.all([
+    api<Position>(`/positions/${id}`),
+    getAuthCookie(),
+  ]);
+  const role = token ? decodeAuthToken(token).role : null;
+  const isCandidate = role === "CANDIDATE";
 
   if (!res.ok) {
     return (
@@ -97,12 +104,16 @@ export default async function PositionDetailPage({
         </article>
 
         <div className="mt-12 flex flex-col sm:flex-row gap-3 border-t border-border pt-8">
-          <Link
-            href={`/login?from=/positions/${position.id}`}
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary/20 hover:bg-primary-dark transition-all"
-          >
-            Candidatar-se
-          </Link>
+          {isCandidate ? (
+            <ApplyButton positionId={position.id} />
+          ) : (
+            <Link
+              href={`/login?from=/positions/${position.id}`}
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary/20 hover:bg-primary-dark transition-all"
+            >
+              Candidatar-se
+            </Link>
+          )}
           <Link
             href="/positions"
             className="inline-flex items-center justify-center rounded-xl border border-border px-6 py-3.5 text-sm font-semibold text-secondary hover:border-primary/40 hover:text-primary transition-colors"
