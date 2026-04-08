@@ -132,6 +132,8 @@ export class PositionsService {
 
   async findAllForManagement(query: ManagePositionsQuery, recruiterId: string) {
     const { page, limit, search, employmentType, mine, isActive } = query;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const where: Prisma.PositionWhereInput = {
       ...(typeof isActive === 'boolean' ? { isActive } : {}),
@@ -167,6 +169,10 @@ export class PositionsService {
           _count: {
             select: { applications: true },
           },
+          applications: {
+            where: { createdAt: { gte: sevenDaysAgo } },
+            select: { id: true },
+          },
         },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
@@ -175,7 +181,12 @@ export class PositionsService {
       this.prisma.position.count({ where }),
     ]);
 
-    return { items, total, page, limit };
+    const mapped = items.map(({ applications, ...rest }) => ({
+      ...rest,
+      newApplicationsCount: applications.length,
+    }));
+
+    return { items: mapped, total, page, limit };
   }
 
   async findApplicationsByPosition(positionId: string) {
