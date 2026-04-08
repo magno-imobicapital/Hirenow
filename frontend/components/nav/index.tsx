@@ -12,7 +12,14 @@ export default function AppNav({ user }: { user: UserInfo | null }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
+  const EXACT_MATCH = new Set([
+    "/dashboard",
+    "/recruiter/dashboard",
+    "/admin/dashboard",
+  ]);
+
   function isActive(href: string) {
+    if (EXACT_MATCH.has(href)) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   }
 
