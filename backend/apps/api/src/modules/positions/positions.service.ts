@@ -164,6 +164,50 @@ export class PositionsService {
     return { items, total, page, limit };
   }
 
+  async findApplicationsByPosition(positionId: string) {
+    const position = await this.prisma.position.findUnique({
+      where: { id: positionId },
+      select: { id: true, title: true },
+    });
+
+    if (!position) {
+      throw new NotFoundException('Posição não encontrada');
+    }
+
+    const applications = await this.prisma.application.findMany({
+      where: { positionId },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: { fullName: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const grouped: Record<string, typeof applications> = {};
+    for (const app of applications) {
+      const key = app.status as string;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(app);
+    }
+
+    return {
+      position,
+      total: applications.length,
+      groups: grouped,
+    };
+  }
+
   async update(id: string, dto: UpdatePositionDto) {
     const exists = await this.prisma.position.findUnique({
       where: { id },

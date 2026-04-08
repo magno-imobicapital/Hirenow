@@ -64,6 +64,12 @@ export class PositionsController {
   }
 
   @Roles(UserRole.RECRUITER)
+  @Get(':id/applications')
+  findApplications(@Param('id', ParseUUIDPipe) id: string) {
+    return this.positionsService.findApplicationsByPosition(id);
+  }
+
+  @Roles(UserRole.RECRUITER)
   @Patch(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
