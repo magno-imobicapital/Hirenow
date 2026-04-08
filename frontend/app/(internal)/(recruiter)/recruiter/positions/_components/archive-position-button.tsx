@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "react-toastify";
 import { togglePositionActiveAction } from "../_actions";
 
 type TogglePositionActiveButtonProps = {
@@ -17,7 +18,11 @@ export default function TogglePositionActiveButton({
   function onClick() {
     startTransition(async () => {
       const res = await togglePositionActiveAction(positionId, !isActive);
-      if (!res.ok) alert(res.error.join("\n"));
+      if (!res.ok) {
+        res.error.forEach((m) => toast.error(m));
+        return;
+      }
+      toast.success(isActive ? "Vaga desativada" : "Vaga ativada");
     });
   }
 

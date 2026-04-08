@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useForm, type Resolver } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { saveProfileAction } from "../_actions";
 
@@ -80,8 +81,13 @@ export default function ProfileForm({ defaultValues, exists }: ProfileFormProps)
             : undefined,
       };
       const res = await saveProfileAction(payload, exists);
-      if (!res.ok) setServerErrors(res.error);
-      else setSuccess(true);
+      if (!res.ok) {
+        setServerErrors(res.error);
+        res.error.forEach((m) => toast.error(m));
+        return;
+      }
+      setSuccess(true);
+      toast.success("Perfil salvo");
     });
   }
 

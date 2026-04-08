@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "react-toastify";
 import { updateApplicationStatusAction } from "../_actions";
 
 const STATUSES = [
@@ -45,7 +46,11 @@ export default function StatusSelect({
         next,
         positionId,
       );
-      if (!res.ok) alert(res.error.join("\n"));
+      if (!res.ok) {
+        res.error.forEach((m) => toast.error(m));
+        return;
+      }
+      toast.success("Status atualizado");
     });
   }
 

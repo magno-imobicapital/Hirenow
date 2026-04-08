@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useForm, type Resolver } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import Modal from "@/components/modal";
 import { scheduleInterviewAction } from "../_actions";
@@ -74,6 +75,7 @@ export default function ScheduleInterviewButton({
         setServerErrors(res.error);
         return;
       }
+      toast.success("Entrevista agendada");
       setOpen(false);
       reset();
     });

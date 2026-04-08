@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import Modal from "@/components/modal";
 import { createPositionAction } from "../_actions";
 import PositionForm from "./position-form";
@@ -23,7 +24,10 @@ export default function NewPositionButton() {
           submitLabel="Criar vaga"
           onSubmit={async (values) => {
             const res = await createPositionAction(values);
-            if (res.ok) setOpen(false);
+            if (res.ok) {
+              toast.success("Vaga criada com sucesso");
+              setOpen(false);
+            }
             return res;
           }}
           onCancel={() => setOpen(false)}

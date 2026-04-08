@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { toast } from "react-toastify";
 import { applyToPositionAction } from "../_actions";
 
 type ApplyButtonProps = {
@@ -22,6 +23,7 @@ export default function ApplyButton({ positionId }: ApplyButtonProps) {
       const res = await applyToPositionAction(positionId);
       if (res && !res.ok) {
         setError(res.error.join(" "));
+        res.error.forEach((m) => toast.error(m));
         if (
           res.reason === "no-profile" ||
           res.reason === "incomplete-profile" ||

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import Modal from "@/components/modal";
 import { updatePositionAction } from "../_actions";
 import PositionForm from "./position-form";
@@ -67,7 +68,10 @@ export default function EditPositionButton({ position }: EditPositionButtonProps
             const { isActive: _ignored, ...rest } = values;
             void _ignored;
             const res = await updatePositionAction(position.id, rest);
-            if (res.ok) setOpen(false);
+            if (res.ok) {
+              toast.success("Vaga atualizada");
+              setOpen(false);
+            }
             return res;
           }}
           onCancel={() => setOpen(false)}

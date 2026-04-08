@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "react-toastify";
 import Modal from "@/components/modal";
 import { withdrawApplicationAction } from "../_actions";
 
@@ -25,6 +26,7 @@ export default function WithdrawButton({
         setError(res.error.join("\n"));
         return;
       }
+      toast.success("Você desistiu da candidatura");
       setOpen(false);
     });
   }

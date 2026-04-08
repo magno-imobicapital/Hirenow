@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { toast } from "react-toastify";
 import { uploadResumeAction } from "../_actions";
 
 type ResumeUploadProps = {
@@ -22,7 +23,12 @@ export default function ResumeUpload({ resumeUrl }: ResumeUploadProps) {
 
     startTransition(async () => {
       const res = await uploadResumeAction(formData);
-      if (!res.ok) setError(res.error.join("\n"));
+      if (!res.ok) {
+        setError(res.error.join("\n"));
+        res.error.forEach((m) => toast.error(m));
+      } else {
+        toast.success("Currículo enviado");
+      }
       if (inputRef.current) inputRef.current.value = "";
     });
   }
