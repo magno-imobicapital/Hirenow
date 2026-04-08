@@ -1,8 +1,6 @@
-import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import PageStatistics from "@/components/page-statistics";
 import { api } from "@/lib/api";
-import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -13,139 +11,247 @@ type PositionsStats = {
   newCandidatesThisWeek: number;
 };
 
-type ManagedPosition = {
+type ApplicationStatus =
+  | "PENDING"
+  | "REVIEWING"
+  | "INTERVIEW"
+  | "TECHNICAL_INTERVIEW"
+  | "WITHDRAWN"
+  | "HIRED"
+  | "REJECTED";
+
+type Application = {
   id: string;
-  title: string;
-  employmentType: string;
-  location: string;
-  isActive: boolean;
+  status: ApplicationStatus;
   createdAt: string;
-  _count: { applications: number };
-  newApplicationsCount: number;
+  position: { id: string; title: string };
 };
 
-type ManagedPositionsPage = {
-  items: ManagedPosition[];
-  total: number;
+const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  PENDING: "Pendentes",
+  REVIEWING: "Em análise",
+  INTERVIEW: "Entrevista",
+  TECHNICAL_INTERVIEW: "Entrevista técnica",
+  HIRED: "Contratados",
+  REJECTED: "Reprovados",
+  WITHDRAWN: "Desistentes",
 };
+
+const STATUS_COLORS: Record<ApplicationStatus, string> = {
+  PENDING: "bg-slate-400",
+  REVIEWING: "bg-blue-500",
+  INTERVIEW: "bg-amber-500",
+  TECHNICAL_INTERVIEW: "bg-purple-500",
+  HIRED: "bg-green-500",
+  REJECTED: "bg-orange-500",
+  WITHDRAWN: "bg-red-500",
+};
+
+const STATUS_ORDER: ApplicationStatus[] = [
+  "PENDING",
+  "REVIEWING",
+  "INTERVIEW",
+  "TECHNICAL_INTERVIEW",
+  "HIRED",
+  "REJECTED",
+  "WITHDRAWN",
+];
 
 export default async function RecruiterDashboard() {
-  const [statsRes, positionsRes] = await Promise.all([
-    api<PositionsStats>("/positions/stats?mine=true"),
-    api<ManagedPositionsPage>("/positions/manage?mine=true&page=1&limit=5"),
+  const [statsRes, applicationsRes] = await Promise.all([
+    api<PositionsStats>("/positions/stats"),
+    api<Application[]>("/applications/all"),
   ]);
 
   const stats = statsRes.ok ? statsRes.data : null;
   const statsError = statsRes.ok
     ? null
     : "Não foi possível carregar as estatísticas.";
-  const positions = positionsRes.ok ? positionsRes.data.items : [];
+  const applications = applicationsRes.ok ? applicationsRes.data : [];
+
+  // Distribuição por status
+  const byStatus: Record<ApplicationStatus, number> = {
+    PENDING: 0,
+    REVIEWING: 0,
+    INTERVIEW: 0,
+    TECHNICAL_INTERVIEW: 0,
+    HIRED: 0,
+    REJECTED: 0,
+    WITHDRAWN: 0,
+  };
+  for (const app of applications) byStatus[app.status]++;
+
+  const totalApps = applications.length || 1;
+  const hiredCount = byStatus.HIRED;
+  const rejectedCount = byStatus.REJECTED;
+  const withdrawnCount = byStatus.WITHDRAWN;
+  const closedCount = hiredCount + rejectedCount + withdrawnCount;
+  const hireRate = closedCount > 0 ? (hiredCount / closedCount) * 100 : 0;
+
+  // Top 5 vagas por nº de candidatos
+  const countsByPosition = new Map<
+    string,
+    { id: string; title: string; count: number }
+  >();
+  for (const app of applications) {
+    const existing = countsByPosition.get(app.position.id);
+    if (existing) existing.count++;
+    else
+      countsByPosition.set(app.position.id, {
+        id: app.position.id,
+        title: app.position.title,
+        count: 1,
+      });
+  }
+  const topPositions = [...countsByPosition.values()]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  const topMax = topPositions[0]?.count ?? 1;
 
   return (
     <div>
       <PageHeader
         pageName="Painel do Recrutador"
         pageTitle="Dashboard"
-        pageDescription="Resumo das suas vagas e candidaturas recentes."
-        actionButton={{ label: "Ver vagas", href: "/recruiter/positions" }}
+        pageDescription="Visão analítica das vagas e candidaturas da empresa."
       />
 
       <PageStatistics
         error={statsError}
         statistics={[
-          { label: "Minhas vagas abertas", value: stats?.openPositions ?? 0 },
+          { label: "Vagas abertas", value: stats?.openPositions ?? 0 },
           { label: "Total de vagas", value: stats?.totalPositions ?? 0 },
           { label: "Total de candidatos", value: stats?.totalCandidates ?? 0 },
           {
-            label: "Novos esta semana",
-            value: `+${stats?.newCandidatesThisWeek ?? 0}`,
+            label: "Taxa de contratação",
+            value: `${hireRate.toFixed(0)}%`,
             highlight: true,
           },
         ]}
       />
 
-      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto mt-8 pb-12 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-secondary-dark">
-            Vagas recentes
-          </h2>
-          {positions.length > 0 ? (
-            <Link
-              href="/recruiter/positions?mine=true"
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Ver todas →
-            </Link>
-          ) : null}
-        </div>
-
-        {positions.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-primary/5 px-6 py-16 text-center">
-            <p className="text-sm text-muted-foreground">
-              Você ainda não criou nenhuma vaga.
+      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto mt-8 pb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Distribuição por status */}
+        <section className="rounded-xl border border-border bg-primary/5 p-6 flex flex-col gap-4">
+          <header>
+            <h2 className="text-base font-bold text-secondary-dark">
+              Candidaturas por etapa
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Distribuição entre todas as candidaturas ({applications.length}).
             </p>
-            <Link
-              href="/recruiter/positions"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-            >
-              Criar vaga →
-            </Link>
-          </div>
-        ) : (
-          positions.map((p) => (
-            <Link
-              key={p.id}
-              href={`/recruiter/positions/${p.id}`}
-              className="flex flex-col gap-2 rounded-xl border border-border bg-primary/5 p-5 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="flex flex-col gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${
-                      p.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        p.isActive ? "bg-green-500" : "bg-slate-400"
-                      }`}
-                    />
-                    {p.isActive ? "Aberta" : "Encerrada"}
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-secondary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-secondary-dark">
-                    {p.employmentType}
-                  </span>
-                  {p.newApplicationsCount > 0 ? (
-                    <span className="inline-flex items-center rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-white">
-                      +{p.newApplicationsCount} novos
+          </header>
+
+          {applications.length === 0 ? (
+            <p className="text-xs italic text-muted-foreground">
+              Sem candidaturas até o momento.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {STATUS_ORDER.map((status) => {
+                const count = byStatus[status];
+                const pct = (count / totalApps) * 100;
+                return (
+                  <div key={status} className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-secondary-dark">
+                        {STATUS_LABELS[status]}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {count}{" "}
+                        <span className="text-[10px]">
+                          ({pct.toFixed(0)}%)
+                        </span>
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-border">
+                      <div
+                        className={`h-full ${STATUS_COLORS[status]} transition-all`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* Top vagas por candidatos */}
+        <section className="rounded-xl border border-border bg-primary/5 p-6 flex flex-col gap-4">
+          <header>
+            <h2 className="text-base font-bold text-secondary-dark">
+              Top vagas por candidatos
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              As 5 vagas com mais candidaturas recebidas.
+            </p>
+          </header>
+
+          {topPositions.length === 0 ? (
+            <p className="text-xs italic text-muted-foreground">
+              Nenhuma candidatura registrada.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {topPositions.map((p) => (
+                <div key={p.id} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="truncate font-semibold text-secondary-dark">
+                      {p.title}
                     </span>
-                  ) : null}
+                    <span className="text-muted-foreground">{p.count}</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-border">
+                    <div
+                      className="h-full bg-primary"
+                      style={{ width: `${(p.count / topMax) * 100}%` }}
+                    />
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-secondary-dark">
-                  {p.title}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {p.location} • Publicada em {formatDate(p.createdAt)}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col items-end">
-                  <span className="text-xl font-extrabold text-secondary-dark">
-                    {p._count.applications}
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    candidatos
-                  </span>
-                </div>
-                <span className="text-xs font-semibold text-primary">
-                  Ver pipeline →
-                </span>
-              </div>
-            </Link>
-          ))
-        )}
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Resumo de fechamento */}
+        <section className="rounded-xl border border-border bg-primary/5 p-6 lg:col-span-2">
+          <header className="mb-4">
+            <h2 className="text-base font-bold text-secondary-dark">
+              Resumo de fechamento
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Status finais das candidaturas encerradas ({closedCount}).
+            </p>
+          </header>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-lg border border-border bg-background p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Contratados
+              </p>
+              <p className="mt-1 text-2xl font-extrabold text-green-700">
+                {hiredCount}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Reprovados
+              </p>
+              <p className="mt-1 text-2xl font-extrabold text-orange-700">
+                {rejectedCount}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Desistentes
+              </p>
+              <p className="mt-1 text-2xl font-extrabold text-red-700">
+                {withdrawnCount}
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
