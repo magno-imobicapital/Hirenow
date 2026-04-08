@@ -64,7 +64,7 @@ export default async function RecruiterPositions({
 
   const [res, statsRes] = await Promise.all([
     api<ManagedPositionsPage>(`/positions/manage?${apiQuery}`),
-    api<PositionsStats>("/positions/stats"),
+    api<PositionsStats>(`/positions/stats${mine ? "?mine=true" : ""}`),
   ]);
 
   if (!res.ok) {

@@ -45,8 +45,11 @@ export class PositionsController {
 
   @Roles(UserRole.RECRUITER)
   @Get('stats')
-  getStats() {
-    return this.positionsService.getStats();
+  getStats(
+    @Query('mine') mine: string | undefined,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.positionsService.getStats(req.user.id, mine === 'true');
   }
 
   @Roles(UserRole.RECRUITER)
