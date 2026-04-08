@@ -233,10 +233,36 @@ export class PositionsService {
       grouped[key].push(app);
     }
 
+    const nextInterview = await this.prisma.interview.findFirst({
+      where: {
+        application: { positionId },
+        scheduledAt: { gte: new Date() },
+      },
+      orderBy: { scheduledAt: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true,
+        meetingUrl: true,
+        application: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                email: true,
+                profile: { select: { fullName: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+
     return {
       position,
       total: applications.length,
       groups: grouped,
+      nextInterview,
     };
   }
 
