@@ -89,8 +89,8 @@ export default async function RecruiterPositions({
     <div>
       <PageHeader
         pageName="Painel do Recrutador"
-        pageTitle="Suas Vagas"
-        pageDescription="Gerencie posições abertas, acompanhe o pipeline de candidatos e mantenha tudo em movimento."
+        pageTitle="Vagas"
+        pageDescription="Gerencie todas as vagas da empresa. Use o filtro “Criadas por mim” para ver apenas as suas."
         actionSlot={<NewPositionButton />}
       />
       <PageStatistics
