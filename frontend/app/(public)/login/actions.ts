@@ -13,6 +13,7 @@ const REDIRECT_BY_ROLE = {
 export async function loginAction(
   email: string,
   password: string,
+  from?: string,
 ): Promise<{ error: string[] } | void> {
   const response = await api<{ acessToken: string }>("/auth/login", {
     method: "POST",
@@ -27,5 +28,10 @@ export async function loginAction(
 
   await setAuthCookie(response.data.acessToken);
 
-  redirect(REDIRECT_BY_ROLE[role]);
+  const target =
+    from && from.startsWith("/") && !from.startsWith("//")
+      ? from
+      : REDIRECT_BY_ROLE[role];
+
+  redirect(target);
 }

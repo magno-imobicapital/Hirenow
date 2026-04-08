@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "react-toastify";
@@ -20,6 +21,8 @@ export default function LoginPage() {
     formState: { isSubmitting },
   } = useForm<LoginForm>();
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") ?? undefined;
 
   async function onSubmit(data: LoginForm) {
     const result = loginSchema.safeParse(data);
@@ -31,7 +34,7 @@ export default function LoginPage() {
 
     const { email, password } = result.data;
 
-    const res = await loginAction(email, password);
+    const res = await loginAction(email, password, from);
     if (res?.error) {
       res.error.forEach((msg) => toast.error(msg));
       return;
