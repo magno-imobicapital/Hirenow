@@ -6,9 +6,23 @@ type Statistic = {
 
 type PageStatisticsProps = {
   statistics: Statistic[];
+  error?: string | null;
 };
 
-export default function PageStatistics({ statistics }: PageStatisticsProps) {
+export default function PageStatistics({
+  statistics,
+  error,
+}: PageStatisticsProps) {
+  if (error) {
+    return (
+      <div className="max-w-[1500px] px-12 lg:px-16 mx-auto">
+        <div className="rounded-xl border border-dashed border-red-300 bg-red-50 px-6 py-5 text-sm text-red-700">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[1500px] px-12 lg:px-16 mx-auto grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {statistics.map((stat) => (

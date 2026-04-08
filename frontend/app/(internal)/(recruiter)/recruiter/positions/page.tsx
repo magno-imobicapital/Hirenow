@@ -7,6 +7,7 @@ import PositionCard from "./_components/position-card";
 import PositionsFilters from "./_components/positions-filters";
 import NewPositionButton from "./_components/new-position-button";
 import EditPositionButton from "./_components/edit-position-button";
+import PositionsEmptyState from "./_components/positions-empty-state";
 
 type ManagedPosition = {
   id: string;
@@ -78,6 +79,9 @@ export default async function RecruiterPositions({
   const { items, total, limit } = res.data;
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const stats = statsRes.ok ? statsRes.data : null;
+  const statsError = statsRes.ok
+    ? null
+    : "Não foi possível carregar as estatísticas.";
 
   return (
     <div>
@@ -88,6 +92,7 @@ export default async function RecruiterPositions({
         actionSlot={<NewPositionButton />}
       />
       <PageStatistics
+        error={statsError}
         statistics={[
           { label: "Vagas abertas", value: stats?.openPositions ?? 0 },
           { label: "Total de vagas", value: stats?.totalPositions ?? total },
@@ -109,7 +114,9 @@ export default async function RecruiterPositions({
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {items.length === 0 ? (
-            <p className="text-muted-foreground">Nenhuma vaga encontrada.</p>
+            <PositionsEmptyState
+              filtered={Boolean(search || employmentType || mine)}
+            />
           ) : (
             items.map((p) => (
               <PositionCard
