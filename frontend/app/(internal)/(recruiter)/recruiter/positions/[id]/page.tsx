@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import StatusSelect from "./_components/status-select";
 import CandidateProfileButton from "./_components/candidate-profile-button";
+import ScheduleInterviewButton from "./_components/schedule-interview-button";
 
 type ApplicationStatus =
   | "PENDING"
@@ -146,11 +147,21 @@ export default async function PositionPipelinePage({
                       <p className="mt-2 text-[11px] text-muted-foreground">
                         Candidatou-se em {formatDate(app.createdAt)}
                       </p>
-                      <div className="mt-2">
+                      <div className="mt-2 flex flex-col gap-1">
                         <CandidateProfileButton
                           email={app.user.email}
                           profile={app.user.profile}
                         />
+                        {(app.status === "INTERVIEW" ||
+                          app.status === "TECHNICAL_INTERVIEW") && (
+                          <ScheduleInterviewButton
+                            applicationId={app.id}
+                            positionId={position.id}
+                            candidateName={
+                              app.user.profile?.fullName ?? app.user.email
+                            }
+                          />
+                        )}
                       </div>
                       <div className="mt-3">
                         <StatusSelect

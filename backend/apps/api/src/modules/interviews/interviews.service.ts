@@ -1,5 +1,9 @@
 import { MailService, PrismaService } from '@app/shared';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 
 @Injectable()
@@ -17,6 +21,13 @@ export class InterviewsService {
 
     if (!application) {
       throw new NotFoundException('Candidatura não encontrada');
+    }
+
+    const ALLOWED = ['INTERVIEW', 'TECHNICAL_INTERVIEW'];
+    if (!ALLOWED.includes(application.status)) {
+      throw new BadRequestException(
+        'Só é possível agendar entrevista quando o candidato está em etapa de entrevista',
+      );
     }
 
     const interview = await this.prisma.interview.create({
