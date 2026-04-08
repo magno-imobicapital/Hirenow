@@ -3,6 +3,7 @@ import {
   BriefcaseIcon,
   UsersIcon,
   BuildingOffice2Icon,
+  CalendarDaysIcon,
   ChartBarIcon,
   Cog6ToothIcon,
   UserCircleIcon,
@@ -36,6 +37,7 @@ const CANDIDATE_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: Squares2X2Icon },
   { label: "Vagas", href: "/dashboard/positions", icon: BriefcaseIcon },
   { label: "Candidaturas", href: "/dashboard/applications", icon: ClipboardDocumentListIcon },
+  { label: "Entrevistas", href: "/dashboard/interviews", icon: CalendarDaysIcon },
   { label: "Perfil", href: "/profile", icon: UserCircleIcon },
 ];
 
