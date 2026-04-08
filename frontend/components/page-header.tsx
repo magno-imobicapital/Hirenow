@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ReactNode } from "react";
 
 type ActionButton =
   | { label: string; href: string; onClick?: never }
@@ -10,6 +11,7 @@ type PageHeaderProps = {
   pageTitle: string;
   pageDescription: string;
   actionButton?: ActionButton;
+  actionSlot?: ReactNode;
 };
 
 export default function PageHeader({
@@ -17,6 +19,7 @@ export default function PageHeader({
   pageTitle,
   pageDescription,
   actionButton,
+  actionSlot,
 }: PageHeaderProps) {
   return (
     <header className="flex flex-col gap-10 bg-background max-w-[1500px] px-12 pt-10 pb-12 lg:px-16 lg:pt-12 mx-auto">
@@ -41,7 +44,9 @@ export default function PageHeader({
           </p>
         </div>
 
-        {actionButton ? (
+        {actionSlot ? (
+          <div className="shrink-0 self-start sm:self-end">{actionSlot}</div>
+        ) : actionButton ? (
           actionButton.href ? (
             <Link
               href={actionButton.href}

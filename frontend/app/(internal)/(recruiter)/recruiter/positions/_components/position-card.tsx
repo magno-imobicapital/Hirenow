@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 type PositionCardProps = {
   title: string;
   location: string;
@@ -7,7 +9,7 @@ type PositionCardProps = {
   status: "open" | "paused" | "closed";
   publishedAt: string;
   onViewPipeline?: () => void;
-  onEdit?: () => void;
+  editSlot?: ReactNode;
 };
 
 const statusLabels: Record<PositionCardProps["status"], string> = {
@@ -37,7 +39,7 @@ export default function PositionCard({
   status,
   publishedAt,
   onViewPipeline,
-  onEdit,
+  editSlot,
 }: PositionCardProps) {
   return (
     <article className="flex h-full flex-col gap-5 rounded-xl border border-border bg-primary/5 p-6 transition-shadow hover:shadow-md">
@@ -119,25 +121,7 @@ export default function PositionCard({
           <span aria-hidden>→</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onEdit}
-          aria-label="Editar vaga"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-secondary/15 text-secondary-dark hover:bg-secondary/25 transition-colors"
-        >
-          <svg
-            className="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-        </button>
+        {editSlot}
 
         </div>
       </div>

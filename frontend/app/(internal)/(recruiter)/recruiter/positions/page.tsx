@@ -5,6 +5,8 @@ import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import PositionCard from "./_components/position-card";
 import PositionsFilters from "./_components/positions-filters";
+import NewPositionButton from "./_components/new-position-button";
+import EditPositionButton from "./_components/edit-position-button";
 
 type ManagedPosition = {
   id: string;
@@ -83,10 +85,7 @@ export default async function RecruiterPositions({
         pageName="Painel do Recrutador"
         pageTitle="Suas Vagas"
         pageDescription="Gerencie posições abertas, acompanhe o pipeline de candidatos e mantenha tudo em movimento."
-        actionButton={{
-          label: "+ Nova vaga",
-          href: "/recruiter/positions/new",
-        }}
+        actionSlot={<NewPositionButton />}
       />
       <PageStatistics
         statistics={[
@@ -121,6 +120,21 @@ export default async function RecruiterPositions({
                 candidatesCount={p._count.applications}
                 status={p.isActive ? "open" : "closed"}
                 publishedAt={formatDate(p.createdAt)}
+                editSlot={
+                  <EditPositionButton
+                    position={{
+                      id: p.id,
+                      title: p.title,
+                      description: p.description,
+                      employmentType: p.employmentType,
+                      location: p.location,
+                      salaryMin: p.salaryMin,
+                      salaryMax: p.salaryMax,
+                      currency: p.currency,
+                      isActive: p.isActive,
+                    }}
+                  />
+                }
               />
             ))
           )}
