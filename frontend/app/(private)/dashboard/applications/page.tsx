@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import WithdrawButton from "./_components/withdraw-button";
 
 type ApplicationStatus =
   | "PENDING"
@@ -101,12 +102,20 @@ export default async function ApplicationsPage() {
                 </p>
               </div>
 
-              <Link
-                href={`/dashboard/positions/${app.position.id}`}
-                className="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-xs font-semibold text-secondary hover:bg-muted transition-colors whitespace-nowrap"
-              >
-                Ver vaga
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/dashboard/positions/${app.position.id}`}
+                  className="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-xs font-semibold text-secondary hover:bg-muted transition-colors whitespace-nowrap"
+                >
+                  Ver vaga
+                </Link>
+                {app.status !== "WITHDRAWN" && app.status !== "HIRED" ? (
+                  <WithdrawButton
+                    applicationId={app.id}
+                    positionTitle={app.position.title}
+                  />
+                ) : null}
+              </div>
             </article>
           ))
         )}
