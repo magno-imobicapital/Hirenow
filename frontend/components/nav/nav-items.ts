@@ -2,6 +2,7 @@ import {
   Squares2X2Icon,
   BriefcaseIcon,
   CalendarDaysIcon,
+  UsersIcon,
   UserCircleIcon,
   ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
@@ -15,6 +16,7 @@ export type NavItem = {
 
 const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: Squares2X2Icon },
+  { label: "Usuários", href: "/admin/users", icon: UsersIcon },
 ];
 
 const RECRUITER_NAV: NavItem[] = [

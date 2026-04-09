@@ -59,7 +59,7 @@ export class PositionsController {
     res.send(buffer);
   }
 
-  @Roles(UserRole.RECRUITER)
+  @Roles(UserRole.RECRUITER, UserRole.ADMIN)
   @Get('stats')
   getStats(
     @Query('mine') mine: string | undefined,
