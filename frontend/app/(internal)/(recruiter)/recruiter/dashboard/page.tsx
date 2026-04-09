@@ -1,6 +1,7 @@
 import PageHeader from "@/components/page-header";
 import PageStatistics from "@/components/page-statistics";
 import { api } from "@/lib/api";
+import ExportButton from "./_components/export-button";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +115,7 @@ export default async function RecruiterDashboard() {
         pageName="Painel do Recrutador"
         pageTitle="Dashboard"
         pageDescription="Visão analítica das vagas e candidaturas da empresa."
+        actionSlot={<ExportButton />}
       />
 
       <PageStatistics

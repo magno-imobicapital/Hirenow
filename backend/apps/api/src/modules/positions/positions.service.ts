@@ -1,6 +1,7 @@
 import { PrismaService } from '@app/shared';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { EmploymentType, Prisma } from '@prisma/generated';
+import * as ExcelJS from 'exceljs';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { ManagePositionsQuery } from './dto/manage-positions.query';
 import { UpdatePositionDto } from './dto/update-position.dto';
@@ -9,6 +10,83 @@ import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
 @Injectable()
 export class PositionsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async exportXlsx() {
+    const positions = await this.prisma.position.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        employmentType: true,
+        location: true,
+        salaryMin: true,
+        salaryMax: true,
+        currency: true,
+        isActive: true,
+        createdAt: true,
+        createdBy: { select: { email: true } },
+        _count: { select: { applications: true } },
+        applications: {
+          select: { status: true },
+        },
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Hireme';
+    workbook.created = new Date();
+
+    const sheet = workbook.addWorksheet('Vagas');
+    sheet.columns = [
+      { header: 'Título', key: 'title', width: 40 },
+      { header: 'Tipo', key: 'employmentType', width: 14 },
+      { header: 'Localização', key: 'location', width: 24 },
+      { header: 'Salário Min', key: 'salaryMin', width: 14 },
+      { header: 'Salário Max', key: 'salaryMax', width: 14 },
+      { header: 'Moeda', key: 'currency', width: 8 },
+      { header: 'Ativa', key: 'isActive', width: 8 },
+      { header: 'Criada em', key: 'createdAt', width: 18 },
+      { header: 'Criada por', key: 'createdBy', width: 28 },
+      { header: 'Total candidatos', key: 'totalApps', width: 16 },
+      { header: 'Pendentes', key: 'pending', width: 12 },
+      { header: 'Em análise', key: 'reviewing', width: 12 },
+      { header: 'Entrevista', key: 'interview', width: 12 },
+      { header: 'Entrev. técnica', key: 'tech', width: 16 },
+      { header: 'Contratados', key: 'hired', width: 12 },
+      { header: 'Reprovados', key: 'rejected', width: 12 },
+      { header: 'Desistentes', key: 'withdrawn', width: 12 },
+    ];
+
+    sheet.getRow(1).font = { bold: true };
+    sheet.getRow(1).alignment = { vertical: 'middle' };
+
+    for (const p of positions) {
+      const c = (status: string) =>
+        p.applications.filter((a) => a.status === status).length;
+
+      sheet.addRow({
+        title: p.title,
+        employmentType: p.employmentType,
+        location: p.location,
+        salaryMin: Number(p.salaryMin),
+        salaryMax: Number(p.salaryMax),
+        currency: p.currency,
+        isActive: p.isActive ? 'Sim' : 'Não',
+        createdAt: p.createdAt,
+        createdBy: p.createdBy.email,
+        totalApps: p._count.applications,
+        pending: c('PENDING'),
+        reviewing: c('REVIEWING'),
+        interview: c('INTERVIEW'),
+        tech: c('TECHNICAL_INTERVIEW'),
+        hired: c('HIRED'),
+        rejected: c('REJECTED'),
+        withdrawn: c('WITHDRAWN'),
+      });
+    }
+
+    return Buffer.from(await workbook.xlsx.writeBuffer());
+  }
 
   async getStats(recruiterId: string, mine?: boolean) {
     const sevenDaysAgo = new Date();

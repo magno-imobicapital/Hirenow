@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   Param,
   ParseUUIDPipe,
@@ -11,7 +12,9 @@ import {
   Post,
   Query,
   Req,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { UserRole } from '@prisma/generated';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -42,6 +45,18 @@ export class PositionsController {
       query.search,
       query.employmentType,
     );
+  }
+
+  @Roles(UserRole.RECRUITER)
+  @Get('export.xlsx')
+  @Header(
+    'Content-Type',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  )
+  @Header('Content-Disposition', 'attachment; filename="vagas.xlsx"')
+  async exportXlsx(@Res() res: Response) {
+    const buffer = await this.positionsService.exportXlsx();
+    res.send(buffer);
   }
 
   @Roles(UserRole.RECRUITER)
