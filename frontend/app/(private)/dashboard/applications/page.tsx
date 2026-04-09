@@ -2,51 +2,9 @@ import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import { Application, STATUS_LABELS, STATUS_STYLES } from "@/lib/types";
 import ContractInlineActions from "./_components/contract-inline-actions";
 import WithdrawButton from "./_components/withdraw-button";
-
-type ApplicationStatus =
-  | "PENDING"
-  | "REVIEWING"
-  | "INTERVIEW"
-  | "TECHNICAL_INTERVIEW"
-  | "WITHDRAWN"
-  | "HIRED"
-  | "REJECTED";
-
-type Application = {
-  id: string;
-  status: ApplicationStatus;
-  createdAt: string;
-  contractToken: string | null;
-  contractSignedAt: string | null;
-  position: {
-    id: string;
-    title: string;
-    employmentType: string;
-    location: string;
-  };
-};
-
-const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  PENDING: "Pendente",
-  REVIEWING: "Em análise",
-  INTERVIEW: "Entrevista",
-  TECHNICAL_INTERVIEW: "Entrevista técnica",
-  WITHDRAWN: "Desistente",
-  HIRED: "Contratado",
-  REJECTED: "Reprovado",
-};
-
-const STATUS_STYLES: Record<ApplicationStatus, string> = {
-  PENDING: "bg-slate-100 text-slate-700",
-  REVIEWING: "bg-blue-100 text-blue-700",
-  INTERVIEW: "bg-amber-100 text-amber-700",
-  TECHNICAL_INTERVIEW: "bg-purple-100 text-purple-700",
-  WITHDRAWN: "bg-red-100 text-red-700",
-  HIRED: "bg-green-100 text-green-700",
-  REJECTED: "bg-orange-100 text-orange-700",
-};
 
 export default async function ApplicationsPage() {
   const res = await api<Application[]>("/applications");

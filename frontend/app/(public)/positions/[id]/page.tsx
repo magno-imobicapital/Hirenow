@@ -2,20 +2,8 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { decodeAuthToken, getAuthCookie } from "@/lib/auth-cookie";
 import { formatDate, formatSalary } from "@/lib/format";
+import { Position } from "@/lib/types";
 import ApplyButton from "./_components/apply-button";
-
-type Position = {
-  id: string;
-  title: string;
-  description: string;
-  employmentType: string;
-  location: string;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  currency: string | null;
-  isActive: boolean;
-  createdAt: string;
-};
 
 export default async function PositionDetailPage({
   params,

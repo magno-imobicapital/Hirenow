@@ -3,18 +3,7 @@ import PageHeader from "@/components/page-header";
 import { Pagination } from "@/components/pagination";
 import { api } from "@/lib/api";
 import { formatDate, formatSalary } from "@/lib/format";
-
-type Position = {
-  id: string;
-  title: string;
-  description: string;
-  employmentType: string;
-  location: string;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  currency: string | null;
-  createdAt: string;
-};
+import { Position } from "@/lib/types";
 
 type PositionsPage = {
   items: Position[];

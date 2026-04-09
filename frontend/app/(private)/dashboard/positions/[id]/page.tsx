@@ -2,20 +2,8 @@ import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
 import { formatDate, formatSalary } from "@/lib/format";
+import { Position } from "@/lib/types";
 import ApplyButton from "@/app/(public)/positions/[id]/_components/apply-button";
-
-type Position = {
-  id: string;
-  title: string;
-  description: string;
-  employmentType: string;
-  location: string;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  currency: string | null;
-  isActive: boolean;
-  createdAt: string;
-};
 
 export default async function CandidatePositionDetailPage({
   params,

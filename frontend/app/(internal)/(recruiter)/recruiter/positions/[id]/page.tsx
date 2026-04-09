@@ -1,92 +1,15 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import {
+  PipelineResponse,
+  STATUS_ORDER,
+  STATUS_LABELS_PLURAL,
+  STATUS_STYLES,
+} from "@/lib/types";
 import StatusSelect from "./_components/status-select";
 import CandidateProfileButton from "./_components/candidate-profile-button";
 import ScheduleInterviewButton from "./_components/schedule-interview-button";
-
-type ApplicationStatus =
-  | "PENDING"
-  | "REVIEWING"
-  | "INTERVIEW"
-  | "TECHNICAL_INTERVIEW"
-  | "WITHDRAWN"
-  | "HIRED"
-  | "REJECTED";
-
-type CandidateProfile = {
-  fullName: string | null;
-  about: string | null;
-  mobilePhone: string | null;
-  landlinePhone: string | null;
-  salaryExpectation: number | string | null;
-  resumeUrl: string | null;
-};
-
-type PipelineApplication = {
-  id: string;
-  status: ApplicationStatus;
-  createdAt: string;
-  updatedAt: string;
-  recruiterContractUrl: string | null;
-  recruiterResumeUrl: string | null;
-  user: {
-    id: string;
-    email: string;
-    profile: CandidateProfile | null;
-  };
-};
-
-type NextInterview = {
-  id: string;
-  title: string;
-  scheduledAt: string;
-  meetingUrl: string | null;
-  application: {
-    id: string;
-    user: {
-      email: string;
-      profile: { fullName: string | null } | null;
-    };
-  };
-};
-
-type PipelineResponse = {
-  position: { id: string; title: string };
-  total: number;
-  groups: Partial<Record<ApplicationStatus, PipelineApplication[]>>;
-  nextInterview: NextInterview | null;
-};
-
-const STATUS_ORDER: ApplicationStatus[] = [
-  "PENDING",
-  "REVIEWING",
-  "INTERVIEW",
-  "TECHNICAL_INTERVIEW",
-  "HIRED",
-  "REJECTED",
-  "WITHDRAWN",
-];
-
-const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  PENDING: "Pendentes",
-  REVIEWING: "Em análise",
-  INTERVIEW: "Entrevista",
-  TECHNICAL_INTERVIEW: "Entrevista técnica",
-  HIRED: "Contratados",
-  REJECTED: "Reprovados",
-  WITHDRAWN: "Desistentes",
-};
-
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  PENDING: "bg-slate-100 text-slate-700",
-  REVIEWING: "bg-blue-100 text-blue-700",
-  INTERVIEW: "bg-amber-100 text-amber-700",
-  TECHNICAL_INTERVIEW: "bg-purple-100 text-purple-700",
-  HIRED: "bg-green-100 text-green-700",
-  REJECTED: "bg-orange-100 text-orange-700",
-  WITHDRAWN: "bg-red-100 text-red-700",
-};
 
 export default async function PositionPipelinePage({
   params,
@@ -174,9 +97,9 @@ export default async function PositionPipelinePage({
             >
               <header className="flex items-center justify-between">
                 <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${STATUS_COLORS[status]}`}
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${STATUS_STYLES[status]}`}
                 >
-                  {STATUS_LABELS[status]}
+                  {STATUS_LABELS_PLURAL[status]}
                 </span>
                 <span className="text-xs font-semibold text-muted-foreground">
                   {apps.length}

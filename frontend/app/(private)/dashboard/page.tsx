@@ -3,47 +3,15 @@ import PageHeader from "@/components/page-header";
 import PageStatistics from "@/components/page-statistics";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import {
+  ApplicationStatus,
+  Application,
+  Interview,
+  STATUS_LABELS,
+  STATUS_STYLES,
+} from "@/lib/types";
 
-type ApplicationStatus =
-  | "PENDING"
-  | "REVIEWING"
-  | "INTERVIEW"
-  | "TECHNICAL_INTERVIEW"
-  | "WITHDRAWN"
-  | "HIRED"
-  | "REJECTED";
-
-type Application = {
-  id: string;
-  status: ApplicationStatus;
-  createdAt: string;
-  position: {
-    id: string;
-    title: string;
-    employmentType: string;
-    location: string;
-  };
-};
-
-const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  PENDING: "Pendente",
-  REVIEWING: "Em análise",
-  INTERVIEW: "Entrevista",
-  TECHNICAL_INTERVIEW: "Entrevista técnica",
-  WITHDRAWN: "Desistente",
-  HIRED: "Contratado",
-  REJECTED: "Reprovado",
-};
-
-const STATUS_STYLES: Record<ApplicationStatus, string> = {
-  PENDING: "bg-slate-100 text-slate-700",
-  REVIEWING: "bg-blue-100 text-blue-700",
-  INTERVIEW: "bg-amber-100 text-amber-700",
-  TECHNICAL_INTERVIEW: "bg-purple-100 text-purple-700",
-  WITHDRAWN: "bg-red-100 text-red-700",
-  HIRED: "bg-green-100 text-green-700",
-  REJECTED: "bg-orange-100 text-orange-700",
-};
+type ProfileMinimal = { fullName: string | null };
 
 const ACTIVE_STATUSES: ApplicationStatus[] = [
   "PENDING",
@@ -51,19 +19,6 @@ const ACTIVE_STATUSES: ApplicationStatus[] = [
   "INTERVIEW",
   "TECHNICAL_INTERVIEW",
 ];
-
-type Profile = { fullName: string | null };
-
-type Interview = {
-  id: string;
-  title: string;
-  meetingUrl: string | null;
-  scheduledAt: string;
-  application: {
-    id: string;
-    position: { id: string; title: string };
-  };
-};
 
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -77,7 +32,7 @@ function formatDateTime(iso: string) {
 export default async function CandidateDashboard() {
   const [res, profileRes, interviewsRes] = await Promise.all([
     api<Application[]>("/applications"),
-    api<Profile>("/profile"),
+    api<ProfileMinimal>("/profile"),
     api<Interview[]>("/interviews"),
   ]);
   const applications = res.ok ? res.data : [];

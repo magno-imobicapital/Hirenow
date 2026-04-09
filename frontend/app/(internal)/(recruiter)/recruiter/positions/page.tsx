@@ -3,42 +3,17 @@ import PageStatistics from "@/components/page-statistics";
 import { Pagination } from "@/components/pagination";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import {
+  ManagedPosition,
+  ManagedPositionsPage,
+  PositionsStats,
+} from "@/lib/types";
 import PositionCard from "./_components/position-card";
 import PositionsFilters from "./_components/positions-filters";
 import NewPositionButton from "./_components/new-position-button";
 import EditPositionButton from "./_components/edit-position-button";
 import TogglePositionActiveButton from "./_components/archive-position-button";
 import PositionsEmptyState from "./_components/positions-empty-state";
-
-type ManagedPosition = {
-  id: string;
-  title: string;
-  description: string;
-  employmentType: string;
-  location: string;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  currency: string | null;
-  isActive: boolean;
-  createdAt: string;
-  createdBy: { id: string; email: string };
-  _count: { applications: number };
-  newApplicationsCount: number;
-};
-
-type ManagedPositionsPage = {
-  items: ManagedPosition[];
-  total: number;
-  page: number;
-  limit: number;
-};
-
-type PositionsStats = {
-  openPositions: number;
-  totalPositions: number;
-  totalCandidates: number;
-  newCandidatesThisWeek: number;
-};
 
 const PAGE_LIMIT = 9;
 

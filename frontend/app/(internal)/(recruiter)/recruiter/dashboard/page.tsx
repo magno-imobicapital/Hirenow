@@ -1,67 +1,28 @@
 import PageHeader from "@/components/page-header";
 import PageStatistics from "@/components/page-statistics";
 import { api } from "@/lib/api";
+import {
+  PositionsStats,
+  ApplicationStatus,
+  STATUS_LABELS_PLURAL,
+  STATUS_COLORS,
+  STATUS_ORDER,
+} from "@/lib/types";
 import ExportButton from "./_components/export-button";
 
 export const dynamic = "force-dynamic";
 
-type PositionsStats = {
-  openPositions: number;
-  totalPositions: number;
-  totalCandidates: number;
-  newCandidatesThisWeek: number;
-};
-
-type ApplicationStatus =
-  | "PENDING"
-  | "REVIEWING"
-  | "INTERVIEW"
-  | "TECHNICAL_INTERVIEW"
-  | "WITHDRAWN"
-  | "HIRED"
-  | "REJECTED";
-
-type Application = {
+type DashboardApplication = {
   id: string;
   status: ApplicationStatus;
   createdAt: string;
   position: { id: string; title: string };
 };
 
-const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  PENDING: "Pendentes",
-  REVIEWING: "Em análise",
-  INTERVIEW: "Entrevista",
-  TECHNICAL_INTERVIEW: "Entrevista técnica",
-  HIRED: "Contratados",
-  REJECTED: "Reprovados",
-  WITHDRAWN: "Desistentes",
-};
-
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  PENDING: "bg-slate-400",
-  REVIEWING: "bg-blue-500",
-  INTERVIEW: "bg-amber-500",
-  TECHNICAL_INTERVIEW: "bg-purple-500",
-  HIRED: "bg-green-500",
-  REJECTED: "bg-orange-500",
-  WITHDRAWN: "bg-red-500",
-};
-
-const STATUS_ORDER: ApplicationStatus[] = [
-  "PENDING",
-  "REVIEWING",
-  "INTERVIEW",
-  "TECHNICAL_INTERVIEW",
-  "HIRED",
-  "REJECTED",
-  "WITHDRAWN",
-];
-
 export default async function RecruiterDashboard() {
   const [statsRes, applicationsRes] = await Promise.all([
     api<PositionsStats>("/positions/stats"),
-    api<Application[]>("/applications/all"),
+    api<DashboardApplication[]>("/applications/all"),
   ]);
 
   const stats = statsRes.ok ? statsRes.data : null;
@@ -157,7 +118,7 @@ export default async function RecruiterDashboard() {
                   <div key={status} className="flex flex-col gap-1">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-secondary-dark">
-                        {STATUS_LABELS[status]}
+                        {STATUS_LABELS_PLURAL[status]}
                       </span>
                       <span className="text-muted-foreground">
                         {count}{" "}

@@ -1,19 +1,9 @@
 import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
+import { Interview } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-type Interview = {
-  id: string;
-  title: string;
-  meetingUrl: string | null;
-  scheduledAt: string;
-  application: {
-    id: string;
-    position: { id: string; title: string };
-  };
-};
 
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("pt-BR", {

@@ -1,18 +1,11 @@
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import { User } from "@/lib/types";
 import CreateUserButton from "./_components/create-user-button";
 import ToggleActiveButton from "./_components/toggle-active-button";
 
 export const dynamic = "force-dynamic";
-
-type User = {
-  id: string;
-  email: string;
-  role: "ADMIN" | "RECRUITER" | "CANDIDATE";
-  isActive: boolean;
-  createdAt: string;
-};
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Admin",

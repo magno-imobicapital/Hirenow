@@ -1,21 +1,8 @@
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
+import { UserStats, PositionsStats } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-type UserStats = {
-  total: number;
-  candidates: number;
-  recruiters: number;
-  admins: number;
-};
-
-type PositionsStats = {
-  openPositions: number;
-  totalPositions: number;
-  totalCandidates: number;
-  newCandidatesThisWeek: number;
-};
 
 function StatCard({
   label,

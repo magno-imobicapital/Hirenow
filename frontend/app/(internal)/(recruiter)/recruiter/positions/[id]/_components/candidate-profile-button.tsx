@@ -2,19 +2,11 @@
 
 import { useState } from "react";
 import Modal from "@/components/modal";
-
-type Profile = {
-  fullName: string | null;
-  about: string | null;
-  mobilePhone: string | null;
-  landlinePhone: string | null;
-  salaryExpectation: number | string | null;
-  resumeUrl: string | null;
-};
+import { CandidateProfile } from "@/lib/types";
 
 type CandidateProfileButtonProps = {
   email: string;
-  profile: Profile | null;
+  profile: CandidateProfile | null;
 };
 
 function formatSalary(value: number | string | null) {
