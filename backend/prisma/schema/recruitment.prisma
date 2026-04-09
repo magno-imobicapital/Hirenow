@@ -47,6 +47,13 @@ model Application {
   positionId String            @map("position_id")
   status     ApplicationStatus @default(PENDING)
 
+  recruiterContractUrl String? @map("recruiter_contract_url")
+  recruiterResumeUrl   String? @map("recruiter_resume_url")
+  adminContractUrl     String? @map("admin_contract_url")
+  adminResumeUrl       String? @map("admin_resume_url")
+  contractToken        String? @unique @map("contract_token")
+  contractSignedAt     DateTime? @map("contract_signed_at")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

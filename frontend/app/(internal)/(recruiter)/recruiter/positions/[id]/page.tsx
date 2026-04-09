@@ -28,6 +28,8 @@ type PipelineApplication = {
   status: ApplicationStatus;
   createdAt: string;
   updatedAt: string;
+  recruiterContractUrl: string | null;
+  recruiterResumeUrl: string | null;
   user: {
     id: string;
     email: string;
@@ -219,6 +221,33 @@ export default async function PositionPipelinePage({
                           />
                         )}
                       </div>
+                      {app.status === "HIRED" &&
+                        (app.recruiterContractUrl ||
+                          app.recruiterResumeUrl) && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {app.recruiterContractUrl && (
+                              <a
+                                href={app.recruiterContractUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-[11px] font-semibold text-green-800 hover:bg-green-200 transition-colors"
+                              >
+                                Contrato
+                              </a>
+                            )}
+                            {app.recruiterResumeUrl && (
+                              <a
+                                href={app.recruiterResumeUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center rounded-md bg-blue-100 px-2.5 py-1 text-[11px] font-semibold text-blue-800 hover:bg-blue-200 transition-colors"
+                              >
+                                Currículo
+                              </a>
+                            )}
+                          </div>
+                        )}
+
                       <div className="mt-3">
                         <StatusSelect
                           applicationId={app.id}

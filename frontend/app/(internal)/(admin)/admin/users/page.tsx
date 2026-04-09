@@ -132,7 +132,13 @@ export default async function AdminUsersPage({
                       {formatDate(u.createdAt)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <ToggleActiveButton userId={u.id} isActive={u.isActive} />
+                      {u.role === "RECRUITER" ? (
+                        <ToggleActiveButton userId={u.id} isActive={u.isActive} />
+                      ) : (
+                        <span className={`text-xs ${u.isActive ? "text-green-700" : "text-muted-foreground"}`}>
+                          {u.isActive ? "Ativo" : "Inativo"}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -89,4 +89,35 @@ export class MailService {
       }),
     });
   }
+
+  async sendContractSigned(data: {
+    email: string;
+    candidateName: string;
+    positionTitle: string;
+  }) {
+    await this.mailQueue.add({
+      to: data.email,
+      subject: `Contrato assinado — ${data.positionTitle}`,
+      html: this.render('contract-signed', data),
+    });
+  }
+
+  async sendContractOffer(data: {
+    email: string;
+    candidateName: string;
+    positionTitle: string;
+    employmentType: string;
+    location: string;
+    salaryMin: string;
+    salaryMax: string;
+    currency: string;
+    acceptUrl: string;
+    rejectUrl: string;
+  }) {
+    await this.mailQueue.add({
+      to: data.email,
+      subject: `Proposta de contratação — ${data.positionTitle}`,
+      html: this.render('contract-offer', data),
+    });
+  }
 }

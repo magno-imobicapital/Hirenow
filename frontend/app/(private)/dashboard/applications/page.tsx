@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageHeader from "@/components/page-header";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
+import ContractInlineActions from "./_components/contract-inline-actions";
 import WithdrawButton from "./_components/withdraw-button";
 
 type ApplicationStatus =
@@ -17,6 +18,8 @@ type Application = {
   id: string;
   status: ApplicationStatus;
   createdAt: string;
+  contractToken: string | null;
+  contractSignedAt: string | null;
   position: {
     id: string;
     title: string;
@@ -105,18 +108,41 @@ export default async function ApplicationsPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/dashboard/positions/${app.position.id}`}
-                  className="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-xs font-semibold text-secondary hover:bg-muted transition-colors whitespace-nowrap"
-                >
-                  Ver vaga
-                </Link>
-                {app.status !== "WITHDRAWN" && app.status !== "HIRED" && app.status !== "REJECTED" ? (
-                  <WithdrawButton
-                    applicationId={app.id}
-                    positionTitle={app.position.title}
-                  />
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/dashboard/positions/${app.position.id}`}
+                    className="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-xs font-semibold text-secondary hover:bg-muted transition-colors whitespace-nowrap"
+                  >
+                    Ver vaga
+                  </Link>
+                  {app.status !== "WITHDRAWN" && app.status !== "HIRED" && app.status !== "REJECTED" ? (
+                    <WithdrawButton
+                      applicationId={app.id}
+                      positionTitle={app.position.title}
+                    />
+                  ) : null}
+                </div>
+                {app.status === "HIRED" && app.contractToken ? (
+                  <div className="flex flex-col items-end gap-1.5">
+                    <Link
+                      href={`/contract/${app.contractToken}`}
+                      className="text-xs font-semibold text-primary hover:underline"
+                    >
+                      Ver contrato →
+                    </Link>
+                    {!app.contractSignedAt ? (
+                      <ContractInlineActions
+                        token={app.contractToken}
+                        positionTitle={app.position.title}
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold text-green-700">
+                        Assinado em{" "}
+                        {new Date(app.contractSignedAt).toLocaleDateString("pt-BR")}
+                      </span>
+                    )}
+                  </div>
                 ) : null}
               </div>
             </article>

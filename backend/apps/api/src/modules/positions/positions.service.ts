@@ -284,6 +284,8 @@ export class PositionsService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        recruiterContractUrl: true,
+        recruiterResumeUrl: true,
         user: {
           select: {
             id: true,

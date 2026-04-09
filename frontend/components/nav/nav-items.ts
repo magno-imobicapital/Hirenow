@@ -2,6 +2,8 @@ import {
   Squares2X2Icon,
   BriefcaseIcon,
   CalendarDaysIcon,
+  DocumentCheckIcon,
+  FolderOpenIcon,
   UsersIcon,
   UserCircleIcon,
   ClipboardDocumentListIcon,
@@ -17,11 +19,13 @@ export type NavItem = {
 const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: Squares2X2Icon },
   { label: "Usuários", href: "/admin/users", icon: UsersIcon },
+  { label: "Contratados", href: "/admin/hired", icon: DocumentCheckIcon },
 ];
 
 const RECRUITER_NAV: NavItem[] = [
   { label: "Dashboard", href: "/recruiter/dashboard", icon: Squares2X2Icon },
   { label: "Vagas", href: "/recruiter/positions", icon: BriefcaseIcon },
+  { label: "Documentos", href: "/recruiter/documents", icon: FolderOpenIcon },
 ];
 
 const CANDIDATE_NAV: NavItem[] = [
