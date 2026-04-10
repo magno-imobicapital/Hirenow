@@ -10,6 +10,8 @@ const prisma = new PrismaClient({
 async function main() {
   const passwordHash = await argon2.hash('Senha@123');
 
+  // ── Usuários ──
+
   const admin = await prisma.user.upsert({
     where: { email: 'admin@hireme.dev' },
     update: {},
@@ -30,8 +32,117 @@ async function main() {
     },
   });
 
+  const lucas = await prisma.user.upsert({
+    where: { email: 'lucas@hireme.dev' },
+    update: {},
+    create: {
+      email: 'lucas@hireme.dev',
+      password: passwordHash,
+      role: 'CANDIDATE',
+    },
+  });
+
+  const magno = await prisma.user.upsert({
+    where: { email: 'magnodbf962@gmail.com' },
+    update: {},
+    create: {
+      email: 'magnodbf962@gmail.com',
+      password: passwordHash,
+      role: 'CANDIDATE',
+    },
+  });
+
+  const dhomini = await prisma.user.upsert({
+    where: { email: 'dhomini@hireme.dev' },
+    update: {},
+    create: {
+      email: 'dhomini@hireme.dev',
+      password: passwordHash,
+      role: 'CANDIDATE',
+    },
+  });
+
+  const renato = await prisma.user.upsert({
+    where: { email: 'renato@hireme.dev' },
+    update: {},
+    create: {
+      email: 'renato@hireme.dev',
+      password: passwordHash,
+      role: 'CANDIDATE',
+    },
+  });
+
+  const gabriel = await prisma.user.upsert({
+    where: { email: 'gabriel@hireme.dev' },
+    update: {},
+    create: {
+      email: 'gabriel@hireme.dev',
+      password: passwordHash,
+      role: 'CANDIDATE',
+    },
+  });
+
   console.log(`✔ admin: ${admin.email}`);
   console.log(`✔ recrutador: ${recruiter.email}`);
+  console.log(`✔ candidatos: lucas, magno, dhomini, renato, gabriel`);
+
+  // ── Perfis dos candidatos ──
+
+  const profiles = [
+    {
+      userId: lucas.id,
+      fullName: 'Lucas Cezario',
+      birthDate: new Date('2000-06-15'),
+      about: 'Formado em segurança da informação',
+      salaryExpectation: 10000,
+      resumeUrl: 'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/resumes/0fc37847-4471-4cd7-96ae-f35e552b422e.pdf',
+    },
+    {
+      userId: magno.id,
+      fullName: 'Magno Durães',
+      birthDate: new Date('2003-12-22'),
+      about: 'Desenvolvedor de software Fullstack e RPA',
+      mobilePhone: '21964305598',
+      salaryExpectation: 12000,
+      resumeUrl: 'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/resumes/6df30bdc-753b-49d7-8410-9b54fb8f2c2d.pdf',
+    },
+    {
+      userId: dhomini.id,
+      fullName: 'Dhomini Pereira',
+      birthDate: new Date('2001-12-10'),
+      about: 'Desenvolvedor Fullstack',
+      salaryExpectation: 17000,
+      resumeUrl: 'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/resumes/65c5a32c-e8c9-4f61-afaa-d3d3be19b7bb.pdf',
+    },
+    {
+      userId: renato.id,
+      fullName: 'Renato Carvalho',
+      birthDate: new Date('2003-12-05'),
+      about: 'Analista de dados',
+      salaryExpectation: 4500,
+      resumeUrl: 'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/resumes/f6607d82-8454-45c3-8583-ea1dfec3343b.pdf',
+    },
+    {
+      userId: gabriel.id,
+      fullName: 'Gabriel Santos',
+      birthDate: new Date('2003-12-12'),
+      about: 'Estagiário em análise de dados',
+      salaryExpectation: 3000,
+      resumeUrl: 'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/resumes/3d6bad44-ea94-4baa-8ef7-b24e8b0ca640.pdf',
+    },
+  ];
+
+  for (const p of profiles) {
+    await prisma.candidateProfile.upsert({
+      where: { userId: p.userId },
+      update: {},
+      create: p,
+    });
+  }
+
+  console.log(`✔ ${profiles.length} perfis criados`);
+
+  // ── Vagas ──
 
   const positions = [
     {
@@ -136,17 +247,54 @@ async function main() {
     },
   ];
 
+  const createdPositions: { id: string; title: string }[] = [];
   for (const p of positions) {
-    await prisma.position.create({
+    const existing = await prisma.position.findFirst({
+      where: { title: p.title },
+    });
+    if (existing) {
+      createdPositions.push(existing);
+      continue;
+    }
+    const created = await prisma.position.create({
       data: {
         ...p,
         isActive: true,
         createdById: recruiter.id,
       },
     });
+    createdPositions.push(created);
   }
 
-  console.log(`✔ ${positions.length} vagas criadas`);
+  console.log(`✔ ${createdPositions.length} vagas`);
+
+  // ── Candidaturas (todos os candidatos em todas as vagas) ──
+
+  const candidates = [lucas, magno, dhomini, renato, gabriel];
+
+  let appCount = 0;
+  for (const position of createdPositions) {
+    for (const candidate of candidates) {
+      const existing = await prisma.application.findUnique({
+        where: {
+          userId_positionId: {
+            userId: candidate.id,
+            positionId: position.id,
+          },
+        },
+      });
+      if (existing) continue;
+      await prisma.application.create({
+        data: {
+          userId: candidate.id,
+          positionId: position.id,
+        },
+      });
+      appCount++;
+    }
+  }
+
+  console.log(`✔ ${appCount} candidaturas criadas`);
 }
 
 main()
