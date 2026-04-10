@@ -23,11 +23,15 @@ import { ListPositionsQuery } from './dto/list-positions.query';
 import { ManagePositionsQuery } from './dto/manage-positions.query';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
+import { AiRankingService } from './ai-ranking.service';
 import { PositionsService } from './positions.service';
 
 @Controller('positions')
 export class PositionsController {
-  constructor(private readonly positionsService: PositionsService) {}
+  constructor(
+    private readonly positionsService: PositionsService,
+    private readonly aiRankingService: AiRankingService,
+  ) {}
 
   @Roles(UserRole.RECRUITER)
   @HttpCode(HttpStatus.CREATED)
@@ -81,6 +85,12 @@ export class PositionsController {
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.positionsService.findOne(id);
+  }
+
+  @Roles(UserRole.RECRUITER)
+  @Get(':id/ranking')
+  getRanking(@Param('id', ParseUUIDPipe) id: string) {
+    return this.aiRankingService.rankCandidates(id);
   }
 
   @Roles(UserRole.RECRUITER)

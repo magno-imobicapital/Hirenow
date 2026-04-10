@@ -10,6 +10,7 @@ import {
 import StatusSelect from "./_components/status-select";
 import CandidateProfileButton from "./_components/candidate-profile-button";
 import ScheduleInterviewButton from "./_components/schedule-interview-button";
+import AiRankingButton from "./_components/ai-ranking-button";
 
 export default async function PositionPipelinePage({
   params,
@@ -53,6 +54,7 @@ export default async function PositionPipelinePage({
         <p className="text-sm text-muted-foreground">
           {total} {total === 1 ? "candidato" : "candidatos"} no pipeline
         </p>
+        <AiRankingButton positionId={position.id} />
       </div>
 
       {nextInterview ? (
