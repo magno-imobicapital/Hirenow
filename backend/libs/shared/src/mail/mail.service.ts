@@ -34,6 +34,7 @@ export class MailService {
     return Mustache.render(tpl, {
       logoUrl:
         'https://oaok6yzuahtrgi7e.public.blob.vercel-storage.com/logo_white.png',
+      frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
       ...data,
     });
   }
