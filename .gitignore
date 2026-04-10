@@ -38,3 +38,5 @@ coverage/
 generated/
 
 .next/
+.open-next/
+.wrangler/

@@ -1,20 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@app/shared';
 import { execFileSync } from 'child_process';
+import { AiProvider } from './ai-provider';
 
 @Injectable()
 export class AiRankingService {
   private readonly logger = new Logger(AiRankingService.name);
-  private readonly ollamaUrl: string;
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
-  ) {
-    this.ollamaUrl =
-      this.configService.get('OLLAMA_URL') || 'http://localhost:11434';
-  }
+    private readonly aiProvider: AiProvider,
+  ) {}
 
   private extractPdfText(url: string): string {
     try {
@@ -28,7 +24,7 @@ export class AiRankingService {
       });
       return result.trim();
     } catch (err) {
-      console.error('[AI Ranking] PDF extraction failed:', err);
+      this.logger.error(`PDF extraction failed: ${err}`);
       return '';
     }
   }
@@ -78,31 +74,25 @@ export class AiRankingService {
       `Ranking solicitado: positionId=${positionId} candidatos=${applications.length}`,
     );
 
-    const candidatesWithResume = await Promise.all(
-      applications.map(async (a, i) => {
-        const p = a.user.profile;
-        const resumeText = p?.resumeUrl
-          ? this.extractPdfText(p.resumeUrl)
-          : '';
+    const candidatesWithResume = applications.map((a, i) => {
+      const p = a.user.profile;
+      const resumeText = p?.resumeUrl
+        ? this.extractPdfText(p.resumeUrl)
+        : '';
 
-        return {
-          app: a,
-          index: i + 1,
-          text: `Candidato ${i + 1} (ID: ${a.id}):
+      return `Candidato ${i + 1} (ID: ${a.id}):
 - Nome: ${p?.fullName || a.user.email}
 - Sobre: ${p?.about || 'Não informado'}
 - Pretensão salarial: ${p?.salaryExpectation ? `R$ ${p.salaryExpectation}` : 'Não informada'}
 - Conteúdo do currículo:
-${resumeText ? resumeText.slice(0, 3000) : 'Currículo não disponível.'}`,
-        };
-      }),
-    );
+${resumeText ? resumeText.slice(0, 3000) : 'Currículo não disponível.'}`;
+    });
 
-    const candidatesText = candidatesWithResume
-      .map((c) => c.text)
-      .join('\n\n---\n\n');
+    const candidatesText = candidatesWithResume.join('\n\n---\n\n');
 
-    const prompt = `Você é um recrutador sênior especialista em análise de currículos. Sua tarefa é analisar DETALHADAMENTE os candidatos abaixo para a vaga descrita e ranquear os 3 mais compatíveis.
+    const systemPrompt = `Você é um recrutador sênior especialista em análise de currículos. Analise candidatos e retorne APENAS JSON válido, sem markdown, sem texto extra.`;
+
+    const userPrompt = `Analise DETALHADAMENTE os candidatos abaixo para a vaga e ranqueie os 3 mais compatíveis.
 
 CRITÉRIOS DE AVALIAÇÃO (em ordem de importância):
 1. Experiência profissional relevante para a vaga (extraída do currículo)
@@ -126,32 +116,21 @@ INSTRUÇÕES:
 - Compare as experiências e habilidades de cada um com os requisitos da vaga.
 - Seja específico nas justificativas, citando experiências ou habilidades concretas do currículo.
 - Se o candidato não tem currículo, penalize fortemente no ranking.
+- Cada candidato deve aparecer NO MÁXIMO UMA VEZ. Nunca repita o mesmo applicationId.
+- Se houver menos de 3 candidatos, retorne apenas os disponíveis.
 
-Responda APENAS em JSON válido, sem markdown, sem texto extra, no formato exato:
-[{"applicationId": "...", "rank": 1, "reason": "..."}, {"applicationId": "...", "rank": 2, "reason": "..."}, {"applicationId": "...", "rank": 3, "reason": "..."}]
-
-IMPORTANTE: Cada candidato deve aparecer NO MÁXIMO UMA VEZ no ranking. Se houver menos de 3 candidatos, retorne apenas os disponíveis. Nunca repita o mesmo applicationId.`;
-
-    const response = await fetch(`${this.ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3',
-        prompt,
-        stream: false,
-        options: { temperature: 0.2, num_ctx: 8192 },
-      }),
-    });
-
-    if (!response.ok) {
-      this.logger.error(`Ollama retornou status ${response.status}`);
-      throw new Error(`Ollama error: ${response.status}`);
-    }
-
-    const body = await response.json();
-    const text: string = body.response || '';
+Responda APENAS no formato JSON:
+[{"applicationId": "...", "rank": 1, "reason": "..."}, {"applicationId": "...", "rank": 2, "reason": "..."}, {"applicationId": "...", "rank": 3, "reason": "..."}]`;
 
     try {
+      const text = await this.aiProvider.chat(
+        [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        { temperature: 0.2, maxTokens: 4096 },
+      );
+
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (!jsonMatch) return [];
       const ranked: { applicationId: string; rank: number; reason: string }[] =
@@ -193,7 +172,7 @@ IMPORTANTE: Cada candidato deve aparecer NO MÁXIMO UMA VEZ no ranking. Se houve
 
       return result;
     } catch (err) {
-      this.logger.error(`Falha ao parsear resposta do Ollama: ${err}`);
+      this.logger.error(`Falha ao gerar ranking: ${err}`);
       return [];
     }
   }
