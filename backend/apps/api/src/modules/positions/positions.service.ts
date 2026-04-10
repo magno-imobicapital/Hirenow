@@ -1,5 +1,5 @@
 import { PrismaService } from '@app/shared';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type { EmploymentType, Prisma } from '@prisma/generated';
 import * as ExcelJS from 'exceljs';
 import { CreatePositionDto } from './dto/create-position.dto';
@@ -9,6 +9,8 @@ import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
 
 @Injectable()
 export class PositionsService {
+  private readonly logger = new Logger(PositionsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async exportXlsx() {
@@ -131,6 +133,10 @@ export class PositionsService {
         createdById: recruiterId,
       },
     });
+
+    this.logger.log(
+      `Vaga criada: positionId=${position.id} por recruiterId=${recruiterId}`,
+    );
 
     return {
       id: position.id,
@@ -355,6 +361,8 @@ export class PositionsService {
     if (!exists) {
       throw new NotFoundException('Posição não encontrada');
     }
+
+    this.logger.log(`Vaga atualizada: positionId=${id}`);
 
     return this.prisma.position.update({
       where: { id },

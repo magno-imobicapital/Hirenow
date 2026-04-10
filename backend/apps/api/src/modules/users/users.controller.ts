@@ -11,10 +11,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/generated';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreateInternalUserDto } from './dto/create-internal-user.dto';
 import { UsersService } from './users.service';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

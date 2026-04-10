@@ -11,11 +11,14 @@ import {
   Req,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/generated';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { ApplicationsService } from './applications.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
 
+@ApiTags('Applications')
+@ApiBearerAuth()
 @Controller()
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}

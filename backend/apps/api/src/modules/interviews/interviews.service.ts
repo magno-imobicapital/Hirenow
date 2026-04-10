@@ -2,12 +2,15 @@ import { MailService, PrismaService } from '@app/shared';
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 
 @Injectable()
 export class InterviewsService {
+  private readonly logger = new Logger(InterviewsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
@@ -38,6 +41,10 @@ export class InterviewsService {
         scheduledAt: new Date(dto.scheduledAt),
       },
     });
+
+    this.logger.log(
+      `Entrevista agendada: interviewId=${interview.id} applicationId=${applicationId} scheduledAt=${interview.scheduledAt.toISOString()}`,
+    );
 
     await this.mailService.sendInterviewScheduled(
       application.user.email,

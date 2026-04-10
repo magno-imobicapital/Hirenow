@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@app/shared';
 import { execFileSync } from 'child_process';
 
 @Injectable()
 export class AiRankingService {
+  private readonly logger = new Logger(AiRankingService.name);
   private readonly ollamaUrl: string;
 
   constructor(
@@ -73,6 +74,10 @@ export class AiRankingService {
 
     if (applications.length === 0) return [];
 
+    this.logger.log(
+      `Ranking solicitado: positionId=${positionId} candidatos=${applications.length}`,
+    );
+
     const candidatesWithResume = await Promise.all(
       applications.map(async (a, i) => {
         const p = a.user.profile;
@@ -139,6 +144,7 @@ IMPORTANTE: Cada candidato deve aparecer NO MÁXIMO UMA VEZ no ranking. Se houve
     });
 
     if (!response.ok) {
+      this.logger.error(`Ollama retornou status ${response.status}`);
       throw new Error(`Ollama error: ${response.status}`);
     }
 
@@ -181,8 +187,13 @@ IMPORTANTE: Cada candidato deve aparecer NO MÁXIMO UMA VEZ no ranking. Se houve
         if (result.length >= 3) break;
       }
 
+      this.logger.log(
+        `Ranking gerado: positionId=${positionId} resultados=${result.length}`,
+      );
+
       return result;
-    } catch {
+    } catch (err) {
+      this.logger.error(`Falha ao parsear resposta do Ollama: ${err}`);
       return [];
     }
   }

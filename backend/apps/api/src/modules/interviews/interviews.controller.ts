@@ -10,10 +10,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/generated';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { InterviewsService } from './interviews.service';
 
+@ApiTags('Interviews')
+@ApiBearerAuth()
 @Controller()
 export class InterviewsController {
   constructor(private readonly interviewsService: InterviewsService) {}

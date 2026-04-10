@@ -23,9 +23,12 @@ import { ListPositionsQuery } from './dto/list-positions.query';
 import { ManagePositionsQuery } from './dto/manage-positions.query';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { UpdatePositionStatusDto } from './dto/update-position-status.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AiRankingService } from './ai-ranking.service';
 import { PositionsService } from './positions.service';
 
+@ApiTags('Positions')
+@ApiBearerAuth()
 @Controller('positions')
 export class PositionsController {
   constructor(

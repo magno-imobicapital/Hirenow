@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,6 +13,8 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfileService {
+  private readonly logger = new Logger(ProfileService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
@@ -26,13 +29,17 @@ export class ProfileService {
       throw new ConflictException('Perfil já cadastrado');
     }
 
-    return this.prisma.candidateProfile.create({
+    const profile = await this.prisma.candidateProfile.create({
       data: {
         ...dto,
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
         userId,
       },
     });
+
+    this.logger.log(`Perfil criado: userId=${userId}`);
+
+    return profile;
   }
 
   async findMine(userId: string) {
@@ -96,6 +103,8 @@ export class ProfileService {
       where: { userId },
       data: { resumeUrl: blob.url },
     });
+
+    this.logger.log(`Currículo enviado: userId=${userId} url=${blob.url}`);
 
     return { resumeUrl: blob.url };
   }

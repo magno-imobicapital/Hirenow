@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@app/shared';
@@ -10,6 +11,8 @@ import { CreateInternalUserDto } from './dto/create-internal-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(role?: UserRole, search?: string) {
@@ -63,6 +66,10 @@ export class UsersService {
       },
     });
 
+    this.logger.log(
+      `Usuário interno criado: userId=${user.id} role=${user.role}`,
+    );
+
     return { id: user.id, email: user.email, role: user.role };
   }
 
@@ -77,6 +84,8 @@ export class UsersService {
       where: { id },
       data: { isActive: false },
     });
+
+    this.logger.log(`Usuário desativado: userId=${id}`);
   }
 
   async activate(id: string) {
@@ -87,6 +96,8 @@ export class UsersService {
       where: { id },
       data: { isActive: true },
     });
+
+    this.logger.log(`Usuário ativado: userId=${id}`);
 
     return { id, isActive: true };
   }

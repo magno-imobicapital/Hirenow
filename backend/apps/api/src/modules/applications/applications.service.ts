@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,6 +13,8 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ApplicationsService {
+  private readonly logger = new Logger(ApplicationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
@@ -39,6 +42,10 @@ export class ApplicationsService {
       this.prisma.application.create({ data: { userId, positionId } }),
       this.prisma.user.findUnique({ where: { id: userId } }),
     ]);
+
+    this.logger.log(
+      `Candidatura criada: applicationId=${application.id} userId=${userId} positionId=${positionId}`,
+    );
 
     if (user) {
       await this.mailService.sendApplicationCreated(user.email, position.title);
@@ -107,6 +114,10 @@ export class ApplicationsService {
       const candidateName =
         application.user.profile?.fullName || application.user.email;
 
+      this.logger.log(
+        `Candidato movido para HIRED: applicationId=${id} userId=${application.userId} positionId=${application.positionId}`,
+      );
+
       await this.mailService.sendContractOffer({
         email: application.user.email,
         candidateName,
@@ -127,6 +138,10 @@ export class ApplicationsService {
       where: { id },
       data: { status: status as any },
     });
+
+    this.logger.log(
+      `Status alterado: applicationId=${id} de=${application.status} para=${status}`,
+    );
 
     await this.mailService.sendApplicationStatusUpdated(
       application.user.email,
@@ -274,6 +289,10 @@ export class ApplicationsService {
       data: { status: 'WITHDRAWN' },
     });
 
+    this.logger.log(
+      `Candidato desistiu: applicationId=${id} userId=${userId}`,
+    );
+
     return {
       id: updated.id,
       status: updated.status,
@@ -370,6 +389,10 @@ export class ApplicationsService {
       },
     });
 
+    this.logger.log(
+      `Contrato assinado: applicationId=${application.id} userId=${application.userId}`,
+    );
+
     const candidateName =
       application.user.profile?.fullName || application.user.email;
     const positionTitle = application.position.title;
@@ -414,6 +437,10 @@ export class ApplicationsService {
       where: { id: application.id },
       data: { status: 'WITHDRAWN' },
     });
+
+    this.logger.log(
+      `Contrato recusado: applicationId=${application.id} userId=${application.userId}`,
+    );
 
     await this.mailService.sendApplicationStatusUpdated(
       application.user.email,
